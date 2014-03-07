@@ -42,19 +42,20 @@ var textPadding = 5
 
 var loadingTextState = 0
 
-var safeZone = l.entities.camera.width / 5
+var safeZone = l.entities.camera.width / 6
 var playerSpeed = 6
 var playerDirection = 'up'
 var bulletForce = l.entities.camera.width
 var gibletForce = l.entities.camera.width / 6
-var gibletLife = 2500
+var gibletLife = 2000
+var gibletCount = 5
 var canShoot = true
 var timeShoot = 555
 var respawnForce = l.entities.camera.width / 3
 var zombieCount = l.canvas.width / 25
 var zombieSpeed = playerSpeed / 2
 var zombieVisionDistance = l.canvas.width / 5
-var bulletLife = 1500
+var bulletLife = 1000
 var spawned = false
 
 var seconds = 0
@@ -358,24 +359,6 @@ function game()
 		}
 		l.write.hud(score + pluralPoints, l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize * 3, fontFamily, totalSize, colorBullet, 'center')
 
-		if (seconds > 1)
-		{
-			var pluralSeconds = ' seconds'
-		}
-		else
-		{
-			var pluralSeconds = ' second'
-		}
-		if (killed == 1)
-		{
-			var pluralKilled = ' zombie'
-		}
-		else
-		{
-			var pluralKilled = ' zombies'
-		}
-		// l.write.hud(seconds + pluralSeconds + ' survived and ' + killed + pluralKilled + ' killed', l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize * 2, fontFamily, mathSize, colorZombie, 'center')
-
 		if (score < achievementValues[0])
 		{
 			var achievement = achievementTitles[0]
@@ -428,17 +411,14 @@ function game()
 		{
 			var achievement = achievementTitles[11]
 		}
-		l.write.hud('You are ' + achievement + '!', l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize, fontFamily, achievementSize, colorPlayer, 'center')
-		if (localStorage.getItem('name'))
+		l.write.hud('You\'re ' + achievement + '!', l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize, fontFamily, achievementSize, colorPlayer, 'center')
+		if (newHighscore)
 		{
-			if (newHighscore)
-			{
-				l.write.hud('NEW HIGH SCORE', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize, fontFamily, fontSize, colorBullet, 'center')
-			}
-			else
-			{
-				l.write.hud('Highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize, fontFamily, fontSize, colorZombie, 'center')
-			}
+			l.write.hud('New high score!', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorPlayer, 'center')
+		}
+		else
+		{
+			l.write.hud('Highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorZombie, 'center')
 		}
 		l.write.hud('Two-finger touch to retry', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorBullet)
 	}
@@ -490,7 +470,7 @@ function killZombie(bullet, zombie)
 	killed++ // Log the kill
 
 	l.object.delete(bullet)
-	for (var i = 0; i < 8; i++)
+	for (var i = 0; i < gibletCount; i++)
 	{
 		l.object.from('giblet', l.entities[zombie].anchor.x, l.entities[zombie].anchor.y)
 
@@ -533,8 +513,6 @@ function gameover()
 		{
 			newHighscore = true
 			highscore = score
-			// localStorage.setItem('name', prompt('New high score!', ''))
-			localStorage.setItem('name', 'iPhone')
 			localStorage.setItem('highscore', highscore)
 		}
 		else
