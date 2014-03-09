@@ -1,5 +1,7 @@
 l.collision = function(a, b, code)
 {
+	l.keyring.update()
+
 	if (l.entities[a] && l.entities[b])
     {
         if (l.entities[a].bounding.x < l.entities[b].bounding.x + l.entities[b].bounding.width && l.entities[a].bounding.x + l.entities[a].bounding.width > l.entities[b].bounding.x)
@@ -9,6 +11,7 @@ l.collision = function(a, b, code)
                 if (code)
                 {
                     eval(code)
+					l.keyring.update()
                 }
                 else
                 {
@@ -29,44 +32,43 @@ l.collision = function(a, b, code)
     {
     	if (l.entities[a])
     	{
-    		var thingy = Object.keys(l.entities)
+    		l.keyring.update()
 
-    		for (var i = 0; i < thingy.length; i++)
+    		for (var i = 0; i < l.keyring.keys.length; i++)
     		{
-    			if (l.entities[thingy[i]].category == b)
+    			if (l.entities[l.keyring.keys[i]].category == b)
         		{
-    				l.collision(a, thingy[i], code)
+    				l.collision(a, l.keyring.keys[i], code)
     			}
     		}
     	}
     	else if (l.entities[b])
     	{
-    		var thingy = Object.keys(l.entities)
+    		l.keyring.update()
 
-    		for (var i = 0; i < thingy.length; i++)
+    		for (var i = 0; i < l.keyring.keys.length; i++)
     		{
-    			if (l.entities[thingy[i]].category == b)
+    			if (l.entities[l.keyring.keys[i]].category == a)
         		{
-    				l.collision(thingy[i], b, code)
+    				l.collision(l.keyring.keys[i], b, code)
     			}
     		}
     	}
     	else
     	{
-            var thingy = Object.keys(l.entities)
+			l.keyring.update()
 
             for (var i = 0; i < l.tool.count.category(a); i++)
             {
-                for (var j = 0; j < thingy.length; j++)
+                for (var j = 0; j < l.keyring.keys.length; j++)
                 {
-                    if (l.entities[thingy[j]].category == a)
+                    if (l.entities[l.keyring.keys[j]].category == a)
                     {
-                        for (var k = 0; k < thingy.length; k++)
+                        for (var k = 0; k < l.keyring.keys.length; k++)
                         {
-                            if (l.entities[thingy[k]].category == b)
+                            if (l.entities[l.keyring.keys[k]].category == b)
                             {
-                                l.collision(thingy[j], thingy[k], code)
-                                thingy = Object.keys(l.entities) // Reupdate the "database" to prevent calculations regarding deleted objects
+                                l.collision(l.keyring.keys[j], l.keyring.keys[k], code)
                             }
                         }
                     }

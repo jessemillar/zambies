@@ -1,4 +1,21 @@
 l.entities = new Object() // The object that keeps track of our game objects
+l.keyring = new Object() // Group the object key functinos and values
+	l.keyring.keys = Object.keys(l.entities)
+
+l.keyring.update = function()
+{
+	l.keyring.keys = Object.keys(l.entities)
+	
+	/*
+	for (var keys in l.keyring.keys)
+	{
+		if (!l.entities[l.keyring.keys[keys]]) // Check if it exists
+		{
+			l.keyring.keys.splice(keys, 1) // Remove if it doesn't
+		}
+	}
+	*/
+}
 
 l.object = new Object() // Group the object functions
 
@@ -71,17 +88,17 @@ l.object.delete = function(name)
 {
     if (l.entities[name])
     {
-        delete l.entities[name]
+		delete l.entities[name]
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var keys in l.keyring.keys)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[keys]].category == name)
             {
-                l.object.delete(thingy[i])
+                l.object.delete(l.keyring.keys[keys])
             }
         }
     }

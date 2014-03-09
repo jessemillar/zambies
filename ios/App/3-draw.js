@@ -15,13 +15,13 @@ l.buffer.object = function(name, flipped)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[i]].category == name)
             {
-                l.buffer.object(thingy[i], flipped)
+                l.buffer.object(l.keyring.keys[i], flipped)
             }
         }
     }
@@ -182,13 +182,13 @@ l.draw.hud = function(name, flipped)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[i]].category == name)
             {
-                l.draw.hud(thingy[i], flipped)
+                l.draw.hud(l.keyring.keys[i], flipped)
             }
         }
     }

@@ -13,23 +13,25 @@ ejecta.include('5-mouse.js')
 ejecta.include('5-tilt.js')
 ejecta.include('5-touch.js')
 
-var version = '0.1.0'
+var version = '0.1.1' // Make sure to update this for each new version
 
-var colorGround = '#111111'
-var colorZombie = '#3D9970'
-var colorPlayer = '#FFDC00'
-var colorBullet = '#FFFFFF'
+var colorBlack = '#111111'
+var colorGreen = '#3D9970'
+var colorYellow = '#FFDC00'
+var colorWhite = '#FFFFFF'
 
-l.game.setup(colorGround, true)
+l.game.setup(colorBlack, true)
 l.tilt.enable()
 l.touch.enable()
 
 l.debug.all = false
 
 l.canvas.width = l.canvas.width * 2
-l.canvas.height = l.canvas.height * 2
+l.canvas.height = l.canvas.width // Make the playing field square
 
 l.physics.friction(2)
+
+var spawned = false
 
 var maxTilt = 22
 var tiltDirectionPadding = 4
@@ -58,7 +60,6 @@ var zombieCount = l.canvas.width / 25
 var zombieSpeed = playerSpeed / 2
 var zombieVisionDistance = l.canvas.width / 5
 var bulletLife = 1000
-var spawned = false
 
 var seconds = 0
 var killed = 0
@@ -133,6 +134,7 @@ var scoreInterval = setInterval(function()
 
 function game()
 {
+	// FPS calculation stuff
     l.game.cycle.current = new Date
     l.game.fps = Math.round(1000 / (l.game.cycle.current - l.game.cycle.last))
     l.game.cycle.last = l.game.cycle.current
@@ -141,7 +143,7 @@ function game()
 	{
 		var loadingString = null
 
-		l.draw.blank(colorGround)
+		l.draw.blank(colorBlack)
 
 		if (loadingTextState == 0)
 		{
@@ -160,7 +162,7 @@ function game()
 			loadingString = 'Loading...'
 		}
 
-		l.write.hud(loadingString, textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorBullet)
+		l.write.hud(loadingString, textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
 	}
 	else if (l.game.state == 'menu')
 	{
@@ -171,11 +173,11 @@ function game()
 		}
 
 		l.draw.blank()
-		l.write.hud('Zambies!', l.entities.camera.width / 2, l.entities.camera.height / 2 - titleSize - fontSize, fontFamily, titleSize, colorPlayer, 'center')
-		l.write.hud('[Tilt] to move and aim', l.entities.camera.width / 2, l.entities.camera.height / 2 + fontSize, fontFamily, fontSize, colorZombie, 'center')
-		l.write.hud('[Tap] or [Hold] to shoot', l.entities.camera.width / 2, l.entities.camera.height / 2 + fontSize * 3, fontFamily, fontSize, colorZombie, 'center')
-		l.write.hud('Two-finger touch to start', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorBullet)
-		l.write.hud(version, l.entities.camera.width - textPadding, textPadding, fontFamily, fontSize / 2, colorBullet, 'right') // Display the FPS
+		l.write.hud('Zambies!', l.entities.camera.width / 2, l.entities.camera.height / 2 - titleSize - fontSize, fontFamily, titleSize, colorYellow, 'center')
+		l.write.hud('[Tilt] to move and aim', l.entities.camera.width / 2, l.entities.camera.height / 2 + fontSize, fontFamily, fontSize, colorGreen, 'center')
+		l.write.hud('[Tap] or [Hold] to shoot', l.entities.camera.width / 2, l.entities.camera.height / 2 + fontSize * 3, fontFamily, fontSize, colorGreen, 'center')
+		l.write.hud('Two-finger touch to start', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
+		l.write.hud(version, l.entities.camera.width - textPadding, textPadding, fontFamily, fontSize / 2, colorWhite, 'right') // Display the FPS
 	}
 	else if (l.game.state == 'running')
 	{
@@ -188,7 +190,7 @@ function game()
 			score = seconds
 		}
 
-		if (l.tool.count.category('zombies') == 0)
+		if (!spawned)
 		{
 			for (var i = 0; i < zombieCount; i++)
 			{
@@ -225,7 +227,7 @@ function game()
 					l.move.snap('zombie' + (Math.round(l.object.last.zombie - zombieCount) + i), x, y)
 				}
 			}
-
+			
 			spawned = true
 		}
 
@@ -281,7 +283,7 @@ function game()
 				l.physics.push.left('bullet' + l.object.last.bullet, bulletForce * (l.tilt.x / maxTilt))
 				l.physics.push.down('bullet' + l.object.last.bullet, bulletForce * (l.tilt.y / maxTilt))
 				
-				killBullet('bullet' + l.object.last.bullet, bulletLife) // Set up a timer to delete the bullet after a while
+				lifespanBullet('bullet' + l.object.last.bullet, bulletLife) // Set up a timer to delete the bullet after a while
 
 				canShoot = false
 
@@ -292,15 +294,16 @@ function game()
 			}
 		}
 
-		var thingy = Object.keys(l.entities) // Make this a part of the engine!
+		l.keyring.update()
 
-		for (var i = 0; i < thingy.length; i++) // Move the zombies
+		for (var i = 0; i < l.keyring.keys.length; i++) // Move the zombies
 		{
-			if (l.entities[thingy[i]].category == 'zombies')
+			l.keyring.update()
+			if (l.entities[l.keyring.keys[i]].category == 'zombies')
 			{
-				if (l.tool.measure.total('player', thingy[i]) < zombieVisionDistance)
+				if (l.tool.measure.total('player', l.keyring.keys[i]) < zombieVisionDistance)
 				{
-					l.physics.pull.toward(thingy[i], 'player', zombieSpeed)
+					l.physics.pull.toward(l.keyring.keys[i], 'player', zombieSpeed)
 				}
 			}
 		}
@@ -328,8 +331,8 @@ function game()
 		l.buffer.object('bullets')
 		l.draw.objects()
 
-		l.write.hud(score, 10, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorBullet)
-		l.write.hud(l.game.fps, l.entities.camera.width - textPadding, textPadding, fontFamily, fontSize / 2, colorPlayer, 'right') // Display the FPS
+		l.write.hud(score, 10, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
+		l.write.hud(l.game.fps, l.entities.camera.width - textPadding, textPadding, fontFamily, fontSize / 2, colorYellow, 'right') // Display the FPS
 	}
 	else if (l.game.state == 'gameover')
 	{
@@ -344,10 +347,11 @@ function game()
 			killed = 0
 			score = 0
 			l.keyboard.clear()
+			spawned = false
 			l.game.state = 'running'
 		}
 
-		l.draw.blank(colorGround)
+		l.draw.blank(colorBlack)
 
 		if (score > 1)
 		{
@@ -357,7 +361,7 @@ function game()
 		{
 			var pluralPoints = ' point'
 		}
-		l.write.hud(score + pluralPoints, l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize * 3, fontFamily, totalSize, colorBullet, 'center')
+		l.write.hud(score + pluralPoints, l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize * 3, fontFamily, totalSize, colorWhite, 'center')
 
 		if (score < achievementValues[0])
 		{
@@ -411,19 +415,17 @@ function game()
 		{
 			var achievement = achievementTitles[11]
 		}
-		l.write.hud('You\'re ' + achievement + '!', l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize, fontFamily, achievementSize, colorPlayer, 'center')
+		l.write.hud('You\'re ' + achievement + '!', l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize, fontFamily, achievementSize, colorYellow, 'center')
 		if (newHighscore)
 		{
-			l.write.hud('New high score!', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorPlayer, 'center')
+			l.write.hud('New high score!', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorYellow, 'center')
 		}
 		else
 		{
-			l.write.hud('Highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorZombie, 'center')
+			l.write.hud('Highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorGreen, 'center')
 		}
-		l.write.hud('Two-finger touch to retry', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorBullet)
+		l.write.hud('Two-finger touch to retry', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
 	}
-	
-	requestAnimationFrame(game)
 }
 
 function spawnZombie(count)
@@ -472,12 +474,16 @@ function killZombie(bullet, zombie)
 	killed++ // Log the kill
 
 	l.object.delete(bullet)
+	
 	for (var i = 0; i < gibletCount; i++)
 	{
-		l.object.from('giblet', l.entities[zombie].anchor.x, l.entities[zombie].anchor.y)
-
-		l.physics.scatter('giblet' + l.object.last.giblet, gibletForce)
-		killGiblet('giblet' + l.object.last.giblet, l.tool.random(gibletLife / 2, gibletLife))
+		if (l.entities[zombie])
+		{
+			l.object.from('giblet', l.entities[zombie].anchor.x, l.entities[zombie].anchor.y)
+			
+			l.physics.scatter('giblet' + l.object.last.giblet, gibletForce)
+			lifespanGiblet('giblet' + l.object.last.giblet, l.tool.random(gibletLife / 2, gibletLife))
+		}
 	}
 	
 	l.object.delete(zombie)
@@ -485,7 +491,7 @@ function killZombie(bullet, zombie)
 	spawnZombie() // Let's make the whole survival thing hopeless, shall we?
 }
 
-function killGiblet(giblet, time)
+function lifespanGiblet(giblet, time)
 {
 	setTimeout(function()
 	{
@@ -493,7 +499,7 @@ function killGiblet(giblet, time)
 	}, time)
 }
 
-function killBullet(bullet, time)
+function lifespanBullet(bullet, time)
 {
 	setTimeout(function()
 	{

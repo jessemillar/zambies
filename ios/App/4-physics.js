@@ -54,13 +54,13 @@ l.physics.update = function(name)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[i]].category == name)
             {
-                l.physics.update(thingy[i])
+                l.physics.update(l.keyring.keys[i])
             }
         }
     }
@@ -82,13 +82,13 @@ l.physics.momentum.stop = function(name)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[i]].category == name)
             {
-                l.physics.momentum.stop(thingy[i])
+                l.physics.momentum.stop(l.keyring.keys[i])
             }
         }
     }
@@ -110,13 +110,13 @@ l.physics.push.up = function(name, force)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[i]].category == name)
             {
-                l.physics.push.up(thingy[i], force)
+                l.physics.push.up(l.keyring.keys[i], force)
             }
         }
     }
@@ -130,13 +130,13 @@ l.physics.push.down = function(name, force)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[i]].category == name)
             {
-                l.physics.push.down(thingy[i], force)
+                l.physics.push.down(l.keyring.keys[i], force)
             }
         }
     }
@@ -150,13 +150,13 @@ l.physics.push.left = function(name, force)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[i]].category == name)
             {
-                l.physics.push.left(thingy[i], force)
+                l.physics.push.left(l.keyring.keys[i], force)
             }
         }
     }
@@ -170,13 +170,13 @@ l.physics.push.right = function(name, force)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[i]].category == name)
             {
-                l.physics.push.right(thingy[i], force)
+                l.physics.push.right(l.keyring.keys[i], force)
             }
         }
     }
@@ -217,13 +217,13 @@ l.physics.pull.to = function(name, x, y, force)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[i]].category == name)
             {
-                l.physics.pull.to(thingy[i], x, y, force)
+                l.physics.pull.to(l.keyring.keys[i], x, y, force)
             }
         }
     }
@@ -262,13 +262,13 @@ l.physics.pull.toward = function(a, b, force)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == a)
+            if (l.entities[l.keyring.keys[i]].category == a)
             {
-                l.physics.pull.toward(thingy[i], b, force)
+                l.physics.pull.toward(l.keyring.keys[i], b, force)
             }
         }
     }
@@ -316,13 +316,13 @@ l.physics.bounce = function(name, xMin, xMax, yMin, yMax)
     }
     else
     {
-        var thingy = Object.keys(l.entities)
+        l.keyring.update()
         
-        for (var i = 0; i < thingy.length; i++)
+        for (var i = 0; i < l.keyring.keys.length; i++)
         {
-            if (l.entities[thingy[i]].category == name)
+            if (l.entities[l.keyring.keys[i]].category == name)
             {
-                l.physics.bounce(thingy[i], xMin, xMax, yMin, yMax)
+                l.physics.bounce(l.keyring.keys[i], xMin, xMax, yMin, yMax)
             }
         }
     }

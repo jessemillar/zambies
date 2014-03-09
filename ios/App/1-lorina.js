@@ -68,8 +68,7 @@ l.game.fullscreen = function()
 
 l.game.start = function()
 {
-    // l.game.loop = setInterval(game, 1000 / 60)
-	requestAnimationFrame(game)
+    l.game.loop = setInterval(game, 1000 / 60)
 }
 
 l.game.stop = function() // Only works once the game is running; no effect during loading or setup
@@ -218,12 +217,12 @@ l.tool.count = new Object() // Group the counting functions
 
 l.tool.count.prototype = function(name) // We give objects created from prototypes a special "category" that allows us to use this function to search for them even if they're not categorized (used for the engine)
 {
-    var thingy = Object.keys(l.entities)
+    l.keyring.update()
     var count = 0
 	
-    for (var i = 0; i < thingy.length; i++)
+    for (var i = 0; i < l.keyring.keys.length; i++)
     {
-        if (l.entities[thingy[i]].prototype == name)
+        if (l.entities[l.keyring.keys[i]].prototype == name)
         {
             count++
         }
@@ -234,13 +233,14 @@ l.tool.count.prototype = function(name) // We give objects created from prototyp
 
 l.tool.count.category = function(name)
 {
-    var thingy = Object.keys(l.entities)
     var count = 0
 	
-    for (var i = 0; i < thingy.length; i++)
-    {
-        if (l.entities[thingy[i]].category == name)
-        {
+	l.keyring.update()
+
+	for (var i = 0; i < l.keyring.keys.length; i++)
+	{
+		if (l.entities[l.keyring.keys[i]].category == name)
+		{
             count++
         }
     }
@@ -288,4 +288,16 @@ l.tool.measure.total = function(a, b, q) // b and q double as x and y
         var vertical = l.tool.measure.y(a, q)
         return Math.floor(Math.sqrt(horizontal * horizontal + vertical * vertical))
     }
+}
+
+l.tool.convert = new Object()
+
+l.tool.convert.radian = function(number)
+{
+	return number * 180 / Math.PI
+}
+
+l.tool.convert.degree = function(number)
+{
+	return number * Math.PI / 180
 }
