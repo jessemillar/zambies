@@ -68,12 +68,50 @@ l.game.fullscreen = function()
 
 l.game.start = function()
 {
-    l.game.loop = setInterval(game, 1000 / 60)
+    l.game.loop = setInterval(l.game.loading, 1000 / 60)
 }
 
 l.game.stop = function() // Only works once the game is running; no effect during loading or setup
 {
     clearInterval(l.game.loop)
+}
+
+l.screen = new Object() // Group the screen functions and values
+l.screen.change = new Object() // Group the screen change functions
+
+l.screen.change.loading = function()
+{
+	clearInterval(l.game.loop)
+	l.game.state = 'loading'
+	l.game.loop = setInterval(l.screen.loading, 1000 / 60)
+}
+
+l.screen.change.menu = function()
+{
+	clearInterval(l.game.loop)
+	l.game.state = 'menu'
+	l.game.loop = setInterval(l.screen.menu, 1000 / 60)
+}
+
+l.screen.change.game = function()
+{
+	clearInterval(l.game.loop)
+	l.game.state = 'game'
+	l.game.loop = setInterval(l.screen.game, 1000 / 60)
+}
+
+l.screen.change.gameover = function()
+{
+	clearInterval(l.game.loop)
+	l.game.state = 'gameover'
+	l.game.loop = setInterval(l.screen.gameover, 1000 / 60)
+}
+
+l.screen.change.paused = function()
+{
+	clearInterval(l.game.loop)
+	l.game.state = 'paused'
+	l.game.loop = setInterval(l.screen.paused, 1000 / 60)
 }
 
 l.camera = new Object() // Group the camera functions
