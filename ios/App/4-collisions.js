@@ -1,21 +1,51 @@
+l.quad = new Object() // Collect the quad tree functions
+
+l.quad.divide = function(size)
+{
+    if (!l.quad.leaves)
+    {
+        l.quad.leaves = new Object()
+            l.quad.leaves.size = Math.floor(l.canvas.width / size)
+            l.quad.leaves.count = l.quad.leaves.size * l.quad.leaves.size
+    }
+
+    if (!l.quad.width && !l.quad.height)
+    {
+        l.quad.width = Math.floor(l.canvas.width / l.quad.leaves.size)
+        l.quad.height = Math.floor(l.canvas.height / l.quad.leaves.size)
+    }
+
+    for (var i in l.entities)
+    {
+        l.entities[i].leaf = Math.floor(l.entities[i].y / l.quad.leaves.size) * l.quad.width + Math.floor(l.entities[i].x / l.quad.leaves.size)
+    }
+}
+
 l.collision = function(a, b, code)
 {
-	l.keyring.update()
-
 	if (l.entities[a] && l.entities[b])
     {
-        if (l.entities[a].bounding.x < l.entities[b].bounding.x + l.entities[b].bounding.width && l.entities[a].bounding.x + l.entities[a].bounding.width > l.entities[b].bounding.x)
+        var leafA = l.entities[a].leaf
+        var leafB = l.entities[b].leaf
+
+        if (leafB == leafA - l.quad.width - 1 || leafB == leafA - l.quad.width || leafB == leafA - l.quad.width + 1 || leafB == leafA - 1 || leafB == leafA || leafB == leafA + 1 || leafB == leafA + l.quad.width - 1 || leafB == leafA + l.quad.width || leafB == leafA + l.quad.width + 1)
         {
-            if (l.entities[a].bounding.y < l.entities[b].bounding.y + l.entities[b].bounding.height && l.entities[a].bounding.y + l.entities[a].bounding.height > l.entities[b].bounding.y)
+            if (l.entities[a].bounding.x < l.entities[b].bounding.x + l.entities[b].bounding.width && l.entities[a].bounding.x + l.entities[a].bounding.width > l.entities[b].bounding.x)
             {
-                if (code)
+                if (l.entities[a].bounding.y < l.entities[b].bounding.y + l.entities[b].bounding.height && l.entities[a].bounding.y + l.entities[a].bounding.height > l.entities[b].bounding.y)
                 {
-                    eval(code)
-					l.keyring.update()
+                    if (code)
+                    {
+                        eval(code)
+                    }
+                    else
+                    {
+                        return true
+                    }
                 }
                 else
                 {
-                    return true
+                    return false
                 }
             }
             else
@@ -32,43 +62,37 @@ l.collision = function(a, b, code)
     {
     	if (l.entities[a])
     	{
-    		l.keyring.update()
-
-    		for (var i = 0; i < l.keyring.keys.length; i++)
+    		for (var i in l.entities)
     		{
-    			if (l.entities[l.keyring.keys[i]].category == b)
+    			if (l.entities[i].category == b)
         		{
-    				l.collision(a, l.keyring.keys[i], code)
+    				l.collision(a, i, code)
     			}
     		}
     	}
     	else if (l.entities[b])
     	{
-    		l.keyring.update()
-
-    		for (var i = 0; i < l.keyring.keys.length; i++)
+    		for (var i in l.entities)
     		{
-    			if (l.entities[l.keyring.keys[i]].category == a)
+    			if (l.entities[i].category == a)
         		{
-    				l.collision(l.keyring.keys[i], b, code)
+    				l.collision(i, b, code)
     			}
     		}
     	}
     	else
     	{
-			l.keyring.update()
-
             for (var i = 0; i < l.tool.count.category(a); i++)
             {
-                for (var j = 0; j < l.keyring.keys.length; j++)
+                for (var i in l.entities)
                 {
-                    if (l.entities[l.keyring.keys[j]].category == a)
+                    if (l.entities[i].category == a)
                     {
-                        for (var k = 0; k < l.keyring.keys.length; k++)
+                        for (var j in l.entities)
                         {
-                            if (l.entities[l.keyring.keys[k]].category == b)
+                            if (l.entities[j].category == b)
                             {
-                                l.collision(l.keyring.keys[j], l.keyring.keys[k], code)
+                                l.collision(i, j, code)
                             }
                         }
                     }

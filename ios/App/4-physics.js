@@ -53,14 +53,12 @@ l.physics.update = function(name)
         }
     }
     else
-    {
-        l.keyring.update()
-        
-        for (var i = 0; i < l.keyring.keys.length; i++)
+    {        
+        for (var i in l.entities)
         {
-            if (l.entities[l.keyring.keys[i]].category == name)
+            if (l.entities[i].category == name)
             {
-                l.physics.update(l.keyring.keys[i])
+                l.physics.update(i)
             }
         }
     }
@@ -81,14 +79,12 @@ l.physics.momentum.stop = function(name)
         l.entities[name].physics.momentum.y = 0
     }
     else
-    {
-        l.keyring.update()
-        
-        for (var i = 0; i < l.keyring.keys.length; i++)
+    {        
+        for (var i in l.entities)
         {
-            if (l.entities[l.keyring.keys[i]].category == name)
+            if (l.entities[i].category == name)
             {
-                l.physics.momentum.stop(l.keyring.keys[i])
+                l.physics.momentum.stop(i)
             }
         }
     }
@@ -109,14 +105,12 @@ l.physics.push.up = function(name, force)
         l.entities[name].physics.momentum.y -= force
     }
     else
-    {
-        l.keyring.update()
-        
-        for (var i = 0; i < l.keyring.keys.length; i++)
+    {        
+        for (var i in l.entities)
         {
-            if (l.entities[l.keyring.keys[i]].category == name)
+            if (l.entities[i].category == name)
             {
-                l.physics.push.up(l.keyring.keys[i], force)
+                l.physics.push.up(i, force)
             }
         }
     }
@@ -129,14 +123,12 @@ l.physics.push.down = function(name, force)
         l.entities[name].physics.momentum.y += force
     }
     else
-    {
-        l.keyring.update()
-        
-        for (var i = 0; i < l.keyring.keys.length; i++)
+    {        
+        for (var i in l.entities)
         {
-            if (l.entities[l.keyring.keys[i]].category == name)
+            if (l.entities[i].category == name)
             {
-                l.physics.push.down(l.keyring.keys[i], force)
+                l.physics.push.down(i, force)
             }
         }
     }
@@ -149,14 +141,12 @@ l.physics.push.left = function(name, force)
         l.entities[name].physics.momentum.x -= force
     }
     else
-    {
-        l.keyring.update()
-        
-        for (var i = 0; i < l.keyring.keys.length; i++)
+    {        
+        for (var i in l.entities)
         {
-            if (l.entities[l.keyring.keys[i]].category == name)
+            if (l.entities[i].category == name)
             {
-                l.physics.push.left(l.keyring.keys[i], force)
+                l.physics.push.left(i, force)
             }
         }
     }
@@ -169,14 +159,12 @@ l.physics.push.right = function(name, force)
         l.entities[name].physics.momentum.x += force
     }
     else
-    {
-        l.keyring.update()
-        
-        for (var i = 0; i < l.keyring.keys.length; i++)
+    {        
+        for (var i in l.entities)
         {
-            if (l.entities[l.keyring.keys[i]].category == name)
+            if (l.entities[i].category == name)
             {
-                l.physics.push.right(l.keyring.keys[i], force)
+                l.physics.push.right(i, force)
             }
         }
     }
@@ -216,14 +204,12 @@ l.physics.pull.to = function(name, x, y, force)
         }
     }
     else
-    {
-        l.keyring.update()
-        
-        for (var i = 0; i < l.keyring.keys.length; i++)
+    {        
+        for (var i in l.entities)
         {
-            if (l.entities[l.keyring.keys[i]].category == name)
+            if (l.entities[i].category == name)
             {
-                l.physics.pull.to(l.keyring.keys[i], x, y, force)
+                l.physics.pull.to(i, x, y, force)
             }
         }
     }
@@ -261,14 +247,12 @@ l.physics.pull.toward = function(a, b, force)
         }
     }
     else
-    {
-        l.keyring.update()
-        
-        for (var i = 0; i < l.keyring.keys.length; i++)
+    {        
+        for (var i in l.entities)
         {
-            if (l.entities[l.keyring.keys[i]].category == a)
+            if (l.entities[i].category == a)
             {
-                l.physics.pull.toward(l.keyring.keys[i], b, force)
+                l.physics.pull.toward(i, b, force)
             }
         }
     }
@@ -315,14 +299,12 @@ l.physics.bounce = function(name, xMin, xMax, yMin, yMax)
 		}
     }
     else
-    {
-        l.keyring.update()
-        
-        for (var i = 0; i < l.keyring.keys.length; i++)
+    {        
+        for (var i in l.entities)
         {
-            if (l.entities[l.keyring.keys[i]].category == name)
+            if (l.entities[i].category == name)
             {
-                l.physics.bounce(l.keyring.keys[i], xMin, xMax, yMin, yMax)
+                l.physics.bounce(i, xMin, xMax, yMin, yMax)
             }
         }
     }

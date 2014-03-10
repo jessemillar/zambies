@@ -1,22 +1,4 @@
 l.entities = new Object() // The object that keeps track of our game objects
-l.keyring = new Object() // Group the object key functinos and values
-	l.keyring.keys = Object.keys(l.entities)
-
-l.keyring.update = function()
-{
-	l.keyring.keys = Object.keys(l.entities)
-	
-	/*
-	for (var keys in l.keyring.keys)
-	{
-		if (!l.entities[l.keyring.keys[keys]]) // Check if it exists
-		{
-			l.keyring.keys.splice(keys, 1) // Remove if it doesn't
-		}
-	}
-	*/
-}
-
 l.object = new Object() // Group the object functions
 
 l.object.last = new Object() // Keep track of the "index" for each prototype we use to bring an object into the world
@@ -92,13 +74,11 @@ l.object.delete = function(name)
     }
     else
     {
-        l.keyring.update()
-        
-        for (var keys in l.keyring.keys)
+        for (var i in l.entities)
         {
-            if (l.entities[l.keyring.keys[keys]].category == name)
+            if (l.entities[i].category == name)
             {
-                l.object.delete(l.keyring.keys[keys])
+                l.object.delete(i)
             }
         }
     }

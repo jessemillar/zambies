@@ -255,12 +255,11 @@ l.tool.count = new Object() // Group the counting functions
 
 l.tool.count.prototype = function(name) // We give objects created from prototypes a special "category" that allows us to use this function to search for them even if they're not categorized (used for the engine)
 {
-    l.keyring.update()
     var count = 0
 	
-    for (var i = 0; i < l.keyring.keys.length; i++)
+    for (var i in l.entities)
     {
-        if (l.entities[l.keyring.keys[i]].prototype == name)
+        if (l.entities[i].prototype == name)
         {
             count++
         }
@@ -273,11 +272,9 @@ l.tool.count.category = function(name)
 {
     var count = 0
 	
-	l.keyring.update()
-
-	for (var i = 0; i < l.keyring.keys.length; i++)
+	for (var i in l.entities)
 	{
-		if (l.entities[l.keyring.keys[i]].category == name)
+		if (l.entities[i].category == name)
 		{
             count++
         }

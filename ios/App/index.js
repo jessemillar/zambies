@@ -13,7 +13,7 @@ ejecta.include('5-mouse.js')
 ejecta.include('5-tilt.js')
 ejecta.include('5-touch.js')
 
-var version = '0.1.1' // Make sure to update this for each new version
+var version = '0.1.2' // Make sure to update this for each new version
 
 var colorBlack = '#111111'
 var colorGreen = '#3D9970'
@@ -34,7 +34,7 @@ l.physics.friction(2)
 
 var spawned = false
 
-var maxTilt = 20
+var maxTilt = 22
 var tiltDirectionPadding = 4
 
 var fontFamily = 'MinercraftoryRegular'
@@ -46,16 +46,15 @@ var textPadding = 5
 
 var loadingTextState = 0
 
-var safeZone = l.entities.camera.width / 6
+var safeZone = l.canvas.width / 15
 var playerSpeed = 6
-var playerDirection = 'up'
-var bulletForce = l.entities.camera.width
-var gibletForce = l.entities.camera.width / 6
+var bulletForce = l.canvas.width / 2
+var gibletForce = l.canvas.width / 12
 var gibletLife = 2000
 var gibletCount = 5
 var canShoot = true
 var timeShoot = 555
-var respawnForce = l.entities.camera.width / 2
+var respawnForce = l.canvas.width / 4
 var zombieCount = l.canvas.width / 20
 var zombieSpeed = playerSpeed / 2
 var zombieVisionDistance = l.canvas.width / 5
@@ -67,7 +66,7 @@ var score = 0
 var newHighscore = false
 
 var achievementValues = [200, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
-var achievementTitles = ['a n00b', 'bazookasaur', 'a space cadet', 'a krazy d00d', 'THE d00d', 'a hunter', 'the one', 'Steve Jobs', 'teh be$t', 'a w!nner', 'the special', 'the doge']
+var achievementTitles = ['a n00b', 'bazookasaur', 'a space man', 'a krazy d00d', 'THE d00d', 'a hunter', 'the one', 'Steve Jobs', 'teh be$t', 'a w!nner', 'the special', 'the doge']
 
 if (localStorage.getItem('highscore'))
 {
@@ -132,7 +131,7 @@ var scoreInterval = setInterval(function()
 						}
 					}, 1000)
 
-l.loading = function()
+l.screen.loading = function()
 {
 	var loadingString = null
 
@@ -176,19 +175,12 @@ l.screen.menu = function()
 
 l.screen.game = function()
 {
+	l.quad.divide(50) // Size of the quad is in pixels
+
 	// FPS calculation stuff
     l.game.cycle.current = new Date
     l.game.fps = Math.round(1000 / (l.game.cycle.current - l.game.cycle.last))
     l.game.cycle.last = l.game.cycle.current
-
-	if (killed) // Update the score
-	{
-		score = seconds * killed
-	}
-	else
-	{
-		score = seconds
-	}
 
 	if (!spawned)
 	{
@@ -283,8 +275,6 @@ l.screen.game = function()
 			l.physics.push.left('bullet' + l.object.last.bullet, bulletForce * (l.tilt.x / maxTilt))
 			l.physics.push.down('bullet' + l.object.last.bullet, bulletForce * (l.tilt.y / maxTilt))
 			
-			lifespanBullet('bullet' + l.object.last.bullet, bulletLife) // Set up a timer to delete the bullet after a while
-
 			canShoot = false
 
 			setTimeout(function()
@@ -294,16 +284,22 @@ l.screen.game = function()
 		}
 	}
 
-	l.keyring.update()
-
-	for (var i = 0; i < l.keyring.keys.length; i++) // Move the zombies
+	if (killed) // Update the score
 	{
-		l.keyring.update()
-		if (l.entities[l.keyring.keys[i]].category == 'zombies')
+		score = seconds * killed
+	}
+	else
+	{
+		score = seconds
+	}
+
+	for (var i in l.entities) // Move the zombies
+	{
+		if (l.entities[i].category == 'zombies')
 		{
-			if (l.tool.measure.total('player', l.keyring.keys[i]) < zombieVisionDistance)
+			if (l.tool.measure.total('player', i) < zombieVisionDistance)
 			{
-				l.physics.pull.toward(l.keyring.keys[i], 'player', zombieSpeed)
+				l.physics.pull.toward(i, 'player', zombieSpeed)
 			}
 		}
 	}
@@ -316,6 +312,17 @@ l.screen.game = function()
 	l.physics.update('bullets')
 	l.physics.update('zombies')
 	l.physics.update('giblets')
+
+	for (var i in l.entities) // Delete the slow bullets
+	{
+		if (l.entities[i].category == 'bullets')
+		{
+			if (l.entities[i].physics.momentum.total < 1)
+			{
+				l.object.delete(i)
+			}
+		}
+	}
 
 	l.physics.bounce('player')
 	l.physics.bounce('bullets')
@@ -352,10 +359,10 @@ l.screen.gameover = function()
 {
 	if (l.touch.database.length > 1)
 	{
-		l.physics.momentum.stop('player')
 		l.object.delete('bullets')
 		l.object.delete('zombies')
 		l.object.delete('giblets')
+		l.physics.momentum.stop('player')
 		l.move.snap('player', l.canvas.width / 2, l.canvas.height / 2)
 		seconds = 0
 		killed = 0
@@ -508,17 +515,6 @@ function lifespanGiblet(giblet, time)
 	setTimeout(function()
 	{
 		l.object.delete(giblet)
-	}, time)
-}
-
-function lifespanBullet(bullet, time)
-{
-	setTimeout(function()
-	{
-		if (l.entities[bullet])
-		{
-			l.object.delete(bullet)
-		}
 	}, time)
 }
 
