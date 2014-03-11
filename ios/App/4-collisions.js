@@ -1,6 +1,9 @@
-l.collision = function(a, b, code)
+l.collision = function(a, b, code, engine)
 {
-    l.quad.divide()
+    if (!engine) // Don't divide for EVERY object the engine automatically checks
+    {
+        l.quad.divide()
+    }
 
 	if (l.entities[a] && l.entities[b]) // Check a for collisions with b
     {
@@ -37,7 +40,7 @@ l.collision = function(a, b, code)
     		{
     			if (l.entities[i].category == b)
         		{
-    				l.collision(a, i, code)
+    				l.collision(a, i, code, true)
     			}
     		}
     	}
@@ -47,7 +50,7 @@ l.collision = function(a, b, code)
     		{
     			if (l.entities[i].category == a)
         		{
-    				l.collision(i, b, code)
+    				l.collision(i, b, code, true)
     			}
     		}
     	}
@@ -65,7 +68,7 @@ l.collision = function(a, b, code)
                         {
                             if (l.entities[possibilities[j]].category == b)
                             {
-                                l.collision(i, possibilities[j], code)
+                                l.collision(i, possibilities[j], code, true)
                             }
                         }
                     }
@@ -79,7 +82,10 @@ l.quad = new Object() // Collect the quad tree functions
 
 l.quad.divide = function()
 {
-    var depth = l.tool.count.all() / 5
+    if (!l.quad.depth)
+    {
+        l.quad.depth = Math.floor(l.tool.count.all() / 5)
+    }
 
     if (!l.quad.leaf)
     {

@@ -3,12 +3,6 @@ var l = new Object() // The Lorina object that keeps the engine functions out of
 l.game = new Object() // Group the game functions
 l.debug = new Object() // Keep track of the various debug options
 
-// Monitor the FPS
-l.game.fps = 0
-l.game.cycle = new Object()
-    l.game.cycle.last = new Date
-    l.game.cycle.current = new Date
-
 l.game.setup = function(gameColor, fullscreen)
 {
     if (fullscreen)

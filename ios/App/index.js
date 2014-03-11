@@ -13,7 +13,7 @@ ejecta.include('5-mouse.js')
 ejecta.include('5-tilt.js')
 ejecta.include('5-touch.js')
 
-var version = '0.1.4' // Make sure to update this for each new version
+var version = '0.1.3' // Make sure to update this for each new version
 
 var colorBlack = '#111111'
 var colorGreen = '#3D9970'
@@ -34,6 +34,8 @@ l.physics.friction(2)
 
 var difficultyIncreaseRate = 1.005
 
+var quadDivisions = 10
+
 var spawned = false
 
 var maxTilt = 22
@@ -50,7 +52,8 @@ var loadingTextState = 0
 
 var safeZone = l.canvas.width / 15
 var playerSpeed = 6
-var bulletForce = l.canvas.width / 2
+var startBulletForce = l.canvas.width / 3
+var bulletForce = startBulletForce
 var gibletForce = l.canvas.width / 12
 var gibletLife = 2000
 var gibletCount = 5
@@ -183,13 +186,6 @@ l.screen.menu = function()
 
 l.screen.game = function()
 {
-	// FPS calculation stuff
-	/*
-    l.game.cycle.current = new Date
-    l.game.fps = Math.round(1000 / (l.game.cycle.current - l.game.cycle.last))
-    l.game.cycle.last = l.game.cycle.current
-    */
-
 	if (!spawned)
 	{
 		for (var i = 0; i < zombieCount; i++)
@@ -281,6 +277,15 @@ l.screen.game = function()
 
 			l.object.from('bullet', l.entities.player.anchor.x, l.entities.player.anchor.y - 5)
 
+			if (l.entities.player.physics.momentum.total > 0)
+			{
+				bulletForce = startBulletForce + l.entities.player.physics.momentum.total
+			}
+			else
+			{
+				bulletForce = startBulletForce
+			}
+
 			if (Math.abs(l.tilt.x) < Math.abs(l.tilt.y))
 			{
 				var ratio = Math.abs(l.tilt.x) / Math.abs(l.tilt.y)
@@ -336,7 +341,6 @@ l.screen.game = function()
 	}
 
 	l.collision('bullets', 'zombies', 'killZombie(a, b)')
-
 	l.collision('player', 'zombies', 'gameover()')
 
 	l.physics.update('player')
@@ -370,22 +374,6 @@ l.screen.game = function()
 	l.draw.objects()
 
 	l.write.hud(score, 10, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
-	
-	/*
-	if (l.game.fps > 55)
-	{
-		var fpsColor = colorGreen
-	}
-	else if (l.game.fps > 45)
-	{
-		var fpsColor = colorYellow
-	}
-	else
-	{
-		var fpsColor = colorRed
-	}
-	l.write.hud(l.game.fps + ' fps', l.entities.camera.width - textPadding, textPadding, fontFamily, fontSize / 2, fpsColor, 'right') // Display the FPS
-	*/
 
 	/*
 	for (var i = 0; i < l.quad.depth; i++)
