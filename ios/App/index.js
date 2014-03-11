@@ -13,7 +13,7 @@ ejecta.include('5-mouse.js')
 ejecta.include('5-tilt.js')
 ejecta.include('5-touch.js')
 
-var version = '0.1.2' // Make sure to update this for each new version
+var version = '0.1.4' // Make sure to update this for each new version
 
 var colorBlack = '#111111'
 var colorGreen = '#3D9970'
@@ -27,14 +27,12 @@ l.touch.enable()
 
 l.debug.all = false
 
-l.audio.mute = true
-
 l.canvas.width = l.canvas.width * 2
 l.canvas.height = l.canvas.width // Make the playing field square
 
 l.physics.friction(2)
 
-var quadDivisions = 10
+var difficultyIncreaseRate = 1.005
 
 var spawned = false
 
@@ -59,10 +57,11 @@ var gibletCount = 5
 var canShoot = true
 var timeShoot = 555
 var respawnForce = l.canvas.width / 4
-var zombieCount = l.canvas.width / 20
-// var zombieCount = 300
-var zombieSpeed = playerSpeed / 2
-var zombieVisionDistance = l.canvas.width / 5
+var zombieCount = Math.floor(l.canvas.width / 18)
+var startZombieSpeed = playerSpeed / 2
+var startZombieVisionDistance = l.canvas.width / 5
+var zombieSpeed = startZombieSpeed
+var zombieVisionDistance = startZombieVisionDistance
 var bulletLife = 1000
 
 var seconds = 0
@@ -70,7 +69,7 @@ var killed = 0
 var score = 0
 var newHighscore = false
 
-var achievementValues = [200, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
+var achievementValues = [100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000]
 var achievementTitles = ['a n00b', 'bazookasaur', 'a space man', 'a krazy d00d', 'THE d00d', 'a hunter', 'the one', 'Steve Jobs', 'teh be$t', 'a w!nner', 'the special', 'the doge']
 
 if (localStorage.getItem('highscore'))
@@ -132,7 +131,11 @@ var scoreInterval = setInterval(function()
 						if (l.game.state == 'game')
 						{
 							seconds++
-							spawnZombie(2)
+							zombieSpeed = zombieSpeed * difficultyIncreaseRate
+							if (zombieVisionDistance < l.canvas.width)
+							{
+								zombieVisionDistance = zombieVisionDistance * difficultyIncreaseRate
+							}
 						}
 					}, 1000)
 
@@ -181,9 +184,11 @@ l.screen.menu = function()
 l.screen.game = function()
 {
 	// FPS calculation stuff
+	/*
     l.game.cycle.current = new Date
     l.game.fps = Math.round(1000 / (l.game.cycle.current - l.game.cycle.last))
     l.game.cycle.last = l.game.cycle.current
+    */
 
 	if (!spawned)
 	{
@@ -275,10 +280,31 @@ l.screen.game = function()
 			l.audio.play('shoot')
 
 			l.object.from('bullet', l.entities.player.anchor.x, l.entities.player.anchor.y - 5)
-			l.quad.divid(quadDivisions)
 
-			l.physics.push.left('bullet' + l.object.last.bullet, bulletForce * (l.tilt.x / maxTilt))
-			l.physics.push.down('bullet' + l.object.last.bullet, bulletForce * (l.tilt.y / maxTilt))
+			if (Math.abs(l.tilt.x) < Math.abs(l.tilt.y))
+			{
+				var ratio = Math.abs(l.tilt.x) / Math.abs(l.tilt.y)
+			}
+			else
+			{
+				var ratio = Math.abs(l.tilt.y) / Math.abs(l.tilt.x)
+			}
+
+			var xForce = Math.abs(l.tilt.x) / Math.sqrt(Math.abs(l.tilt.x) * Math.abs(l.tilt.x) + Math.abs(l.tilt.y) * Math.abs(l.tilt.y)) * bulletForce
+			var yForce = Math.abs(l.tilt.y) / Math.sqrt(Math.abs(l.tilt.x) * Math.abs(l.tilt.x) + Math.abs(l.tilt.y) * Math.abs(l.tilt.y)) * bulletForce
+
+			if (l.tilt.x < 0)
+			{
+				xForce = -xForce
+			}
+
+			if (l.tilt.y < 0)
+			{
+				yForce = -yForce
+			}
+
+			l.physics.push.left('bullet' + l.object.last.bullet, xForce)
+			l.physics.push.down('bullet' + l.object.last.bullet, yForce)
 			
 			canShoot = false
 
@@ -308,8 +334,6 @@ l.screen.game = function()
 			}
 		}
 	}
-
-	l.quad.divide(quadDivisions)
 
 	l.collision('bullets', 'zombies', 'killZombie(a, b)')
 
@@ -347,6 +371,7 @@ l.screen.game = function()
 
 	l.write.hud(score, 10, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
 	
+	/*
 	if (l.game.fps > 55)
 	{
 		var fpsColor = colorGreen
@@ -360,6 +385,7 @@ l.screen.game = function()
 		var fpsColor = colorRed
 	}
 	l.write.hud(l.game.fps + ' fps', l.entities.camera.width - textPadding, textPadding, fontFamily, fontSize / 2, fpsColor, 'right') // Display the FPS
+	*/
 
 	/*
 	for (var i = 0; i < l.quad.depth; i++)
@@ -394,6 +420,8 @@ l.screen.gameover = function()
 		seconds = 0
 		killed = 0
 		score = 0
+		zombieSpeed = startZombieSpeed
+		zombieVisionDistance = startZombieVisionDistance
 		spawned = false
 		l.screen.change.game()
 	}

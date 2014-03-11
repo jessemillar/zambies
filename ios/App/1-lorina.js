@@ -253,6 +253,18 @@ l.tool.random = function(min, max)
 
 l.tool.count = new Object() // Group the counting functions
 
+l.tool.count.all = function()
+{
+    var count = 0
+    
+    for (var i in l.entities)
+    {
+        count++
+    }
+    
+    return count
+}
+
 l.tool.count.prototype = function(name) // We give objects created from prototypes a special "category" that allows us to use this function to search for them even if they're not categorized (used for the engine)
 {
     var count = 0
