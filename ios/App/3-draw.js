@@ -121,7 +121,7 @@ l.draw.objects = function()
             }
             if (l.debug.names || l.debug.all)
             {
-                l.text.write(name, l.entities[l.buffer.database[i].name].x + l.entities[l.buffer.database[i].name].width, l.entities[l.buffer.database[i].name].y, '#ff0000')
+                l.write.text(l.buffer.database[i].name, l.entities[l.buffer.database[i].name].x + l.entities[l.buffer.database[i].name].width, l.entities[l.buffer.database[i].name].y, null, null, '#FF0000')
             }
             if (l.debug.position || l.debug.all)
             {

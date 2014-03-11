@@ -21,16 +21,20 @@ var colorYellow = '#FFDC00'
 var colorWhite = '#FFFFFF'
 var colorRed = '#FF4136'
 
-l.game.setup(colorBlack, true)
+l.game.setup(colorBlack)
 l.tilt.enable()
 l.touch.enable()
 
 l.debug.all = false
 
+l.audio.mute = true
+
 l.canvas.width = l.canvas.width * 2
 l.canvas.height = l.canvas.width // Make the playing field square
 
 l.physics.friction(2)
+
+var quadDivisions = 10
 
 var spawned = false
 
@@ -56,6 +60,7 @@ var canShoot = true
 var timeShoot = 555
 var respawnForce = l.canvas.width / 4
 var zombieCount = l.canvas.width / 20
+// var zombieCount = 300
 var zombieSpeed = playerSpeed / 2
 var zombieVisionDistance = l.canvas.width / 5
 var bulletLife = 1000
@@ -175,8 +180,6 @@ l.screen.menu = function()
 
 l.screen.game = function()
 {
-	l.quad.divide(50) // Size of the quad is in pixels
-
 	// FPS calculation stuff
     l.game.cycle.current = new Date
     l.game.fps = Math.round(1000 / (l.game.cycle.current - l.game.cycle.last))
@@ -272,6 +275,8 @@ l.screen.game = function()
 			l.audio.play('shoot')
 
 			l.object.from('bullet', l.entities.player.anchor.x, l.entities.player.anchor.y - 5)
+			l.quad.divid(quadDivisions)
+
 			l.physics.push.left('bullet' + l.object.last.bullet, bulletForce * (l.tilt.x / maxTilt))
 			l.physics.push.down('bullet' + l.object.last.bullet, bulletForce * (l.tilt.y / maxTilt))
 			
@@ -303,6 +308,8 @@ l.screen.game = function()
 			}
 		}
 	}
+
+	l.quad.divide(quadDivisions)
 
 	l.collision('bullets', 'zombies', 'killZombie(a, b)')
 
@@ -353,6 +360,26 @@ l.screen.game = function()
 		var fpsColor = colorRed
 	}
 	l.write.hud(l.game.fps + ' fps', l.entities.camera.width - textPadding, textPadding, fontFamily, fontSize / 2, fpsColor, 'right') // Display the FPS
+
+	/*
+	for (var i = 0; i < l.quad.depth; i++)
+	{
+		l.ctx.beginPath()
+		l.ctx.moveTo(i * l.quad.leaf.width - l.entities.camera.x, 0)
+		l.ctx.lineTo(i * l.quad.leaf.width - l.entities.camera.x, l.canvas.height)
+		l.ctx.strokeStyle = '#ff0000'
+		l.ctx.stroke()
+	}
+
+	for (var i = 0; i < l.quad.depth; i++)
+	{
+		l.ctx.beginPath()
+		l.ctx.moveTo(0, i * l.quad.leaf.height - l.entities.camera.y)
+		l.ctx.lineTo(l.canvas.width, i * l.quad.leaf.height - l.entities.camera.y)
+		l.ctx.strokeStyle = '#ff0000'
+		l.ctx.stroke()
+	}
+	*/
 }
 
 l.screen.gameover = function()
