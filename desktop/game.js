@@ -1,4 +1,4 @@
-var version = '0.1.2' // Make sure to update this for each new version
+var version = '0.1.5' // Make sure to update this for each new version
 
 var colorBlack = '#111111'
 var colorGreen = '#3D9970'
@@ -10,16 +10,20 @@ l.game.setup(colorBlack, true)
 l.keyboard.enable()
 
 l.debug.all = false
-l.debug.names = true
-l.debug.bounding = true
-l.audio.mute = true
 
-l.canvas.width = window.innerWidth * 2
+l.canvas.width = l.canvas.width * 2
 l.canvas.height = l.canvas.width // Make the playing field square
 
 l.physics.friction(2)
 
+var difficultyIncreaseRate = 1.005
+
+var quadDivisions = 10
+
 var spawned = false
+
+var maxTilt = 22
+var tiltDirectionPadding = 4
 
 var fontFamily = 'MinercraftoryRegular'
 var fontSize = 20
@@ -32,18 +36,19 @@ var loadingTextState = 0
 
 var safeZone = l.canvas.width / 15
 var playerSpeed = 6
-var playerDirection = 'up'
-var bulletForce = l.canvas.width / 2
+var startBulletForce = l.canvas.width / 3
+var bulletForce = startBulletForce
 var gibletForce = l.canvas.width / 12
 var gibletLife = 2000
 var gibletCount = 5
 var canShoot = true
 var timeShoot = 555
 var respawnForce = l.canvas.width / 4
-// var zombieCount = l.canvas.width / 20
-var zombieCount = 10
-var zombieSpeed = playerSpeed / 2
-var zombieVisionDistance = l.canvas.width / 5
+var zombieCount = Math.floor(l.canvas.width / 18)
+var startZombieSpeed = playerSpeed / 2
+var startZombieVisionDistance = l.canvas.width / 5
+var zombieSpeed = startZombieSpeed
+var zombieVisionDistance = startZombieVisionDistance
 var bulletLife = 1000
 
 var seconds = 0
@@ -51,8 +56,8 @@ var killed = 0
 var score = 0
 var newHighscore = false
 
-var achievementValues = [200, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
-var achievementTitles = ['a n00b', 'bazookasaur', 'a space man', 'a krazy d00d', 'THE d00d', 'a hunter', 'the one', 'Steve Jobs', 'teh be$t', 'a w!nner', 'the special', 'the doge']
+var achievementValues = [100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000]
+var achievementTitles = ['a n00b', 'bazookasaur', 'a space man', 'a krazy d00d', 'THE d00d', 'a hunter', 'the one', 'Steve Jobs', 'teh bestest', 'a w!nner', 'the special', 'the doge']
 
 if (localStorage.getItem('highscore'))
 {
@@ -68,21 +73,21 @@ l.audio.make('gameover', 'sounds/gameover.wav')
 l.audio.make('kill', 'sounds/kill.wav')
 l.audio.make('shoot', 'sounds/shoot.wav')
 
-l.object.make('player', l.canvas.width / 2, l.canvas.height / 2, 10, 10)
+l.object.make('player', l.canvas.width / 2, l.canvas.height / 2, 20, 20)
 	l.object.sprite('player', 'images/player.png')
-	l.object.anchor('player', 5, 10)
+	l.object.anchor('player', 10, 20)
 
-l.prototype.make('zombie', 10, 10)
+l.prototype.make('zombie', 20, 20)
 	l.prototype.sprite('zombie', 'images/zombie.png')
 	l.prototype.categorize('zombie', 'zombies')
-	l.prototype.anchor('zombie', 5, 10)
+	l.prototype.anchor('zombie', 10, 20)
 
-l.prototype.make('bullet', 6, 6)
+l.prototype.make('bullet', 12, 12)
 	l.prototype.sprite('bullet', 'images/bullet.png')
 	l.prototype.categorize('bullet', 'bullets')
 	l.prototype.anchor('bullet', 2, 2)
 
-l.prototype.make('giblet', 6, 6)
+l.prototype.make('giblet', 12, 12)
 	l.prototype.sprite('giblet', 'images/giblet.png')
 	l.prototype.categorize('giblet', 'giblets')
 	l.prototype.anchor('giblet', 2, 2)
@@ -113,7 +118,11 @@ var scoreInterval = setInterval(function()
 						if (l.game.state == 'game')
 						{
 							seconds++
-							spawnZombie(2)
+							zombieSpeed = zombieSpeed * difficultyIncreaseRate
+							if (zombieVisionDistance < l.canvas.width)
+							{
+								zombieVisionDistance = zombieVisionDistance * difficultyIncreaseRate
+							}
 						}
 					}, 1000)
 
@@ -161,11 +170,6 @@ l.screen.menu = function()
 
 l.screen.game = function()
 {
-	// FPS calculation stuff
-    l.game.cycle.current = new Date
-    l.game.fps = Math.round(1000 / (l.game.cycle.current - l.game.cycle.last))
-    l.game.cycle.last = l.game.cycle.current
-
 	if (!spawned)
 	{
 		for (var i = 0; i < zombieCount; i++)
@@ -229,7 +233,7 @@ l.screen.game = function()
 		playerDirection = 'right'
 	}
 
-	if (l.keyboard.space)
+	if (l.keyboard.space || l.keyboard.a)
 	{
 		if (canShoot)
 		{
@@ -263,6 +267,58 @@ l.screen.game = function()
 		}
 	}
 
+	if (l.keyboard.space)
+	{
+		if (canShoot)
+		{
+			l.audio.rewind('shoot')
+			l.audio.play('shoot')
+
+			l.object.from('bullet', l.entities.player.anchor.x, l.entities.player.anchor.y - 5)
+
+			if (l.entities.player.physics.momentum.total > 0)
+			{
+				bulletForce = startBulletForce + l.entities.player.physics.momentum.total
+			}
+			else
+			{
+				bulletForce = startBulletForce
+			}
+
+			if (Math.abs(l.tilt.x) < Math.abs(l.tilt.y))
+			{
+				var ratio = Math.abs(l.tilt.x) / Math.abs(l.tilt.y)
+			}
+			else
+			{
+				var ratio = Math.abs(l.tilt.y) / Math.abs(l.tilt.x)
+			}
+
+			var xForce = Math.abs(l.tilt.x) / Math.sqrt(Math.abs(l.tilt.x) * Math.abs(l.tilt.x) + Math.abs(l.tilt.y) * Math.abs(l.tilt.y)) * bulletForce
+			var yForce = Math.abs(l.tilt.y) / Math.sqrt(Math.abs(l.tilt.x) * Math.abs(l.tilt.x) + Math.abs(l.tilt.y) * Math.abs(l.tilt.y)) * bulletForce
+
+			if (l.tilt.x < 0)
+			{
+				xForce = -xForce
+			}
+
+			if (l.tilt.y < 0)
+			{
+				yForce = -yForce
+			}
+
+			l.physics.push.left('bullet' + l.object.last.bullet, xForce)
+			l.physics.push.down('bullet' + l.object.last.bullet, yForce)
+			
+			canShoot = false
+
+			setTimeout(function()
+			{
+				canShoot = true
+			}, timeShoot)
+		}
+	}
+
 	if (killed) // Update the score
 	{
 		score = seconds * killed
@@ -283,10 +339,7 @@ l.screen.game = function()
 		}
 	}
 
-	l.quad.divide(3) // Size of the quad in pixels
-
-	// l.collision('bullets', 'zombies', 'killZombie(a, b)')
-
+	l.collision('bullets', 'zombies', 'killZombie(a, b)')
 	l.collision('player', 'zombies', 'gameover()')
 
 	l.physics.update('player')
@@ -320,21 +373,8 @@ l.screen.game = function()
 	l.draw.objects()
 
 	l.write.hud(score, 10, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
-	
-	if (l.game.fps > 55)
-	{
-		var fpsColor = colorGreen
-	}
-	else if (l.game.fps > 45)
-	{
-		var fpsColor = colorYellow
-	}
-	else
-	{
-		var fpsColor = colorRed
-	}
-	l.write.hud(l.game.fps + ' fps', l.entities.camera.width - textPadding, textPadding, fontFamily, fontSize / 2, fpsColor, 'right') // Display the FPS
 
+	/*
 	for (var i = 0; i < l.quad.depth; i++)
 	{
 		l.ctx.beginPath()
@@ -352,6 +392,7 @@ l.screen.game = function()
 		l.ctx.strokeStyle = '#ff0000'
 		l.ctx.stroke()
 	}
+	*/
 }
 
 l.screen.gameover = function()
@@ -366,6 +407,8 @@ l.screen.gameover = function()
 		seconds = 0
 		killed = 0
 		score = 0
+		zombieSpeed = startZombieSpeed
+		zombieVisionDistance = startZombieVisionDistance
 		spawned = false
 		l.screen.change.game()
 	}
