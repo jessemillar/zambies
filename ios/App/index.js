@@ -15,7 +15,7 @@ ejecta.include('5-touch.js')
 
 l.gamecenter.login.soft()
 
-var version = '0.1.7' // Make sure to update this for each new version
+var version = '0.1.8' // Make sure to update this for each new version
 
 var colorBlack = '#111111'
 var colorGreen = '#3D9970'
@@ -52,7 +52,7 @@ var loadingTextState = 0
 
 var safeZone = l.canvas.width / 15
 var playerSpeed = 6
-var startBulletForce = l.canvas.width / 2
+var startBulletForce = l.canvas.width / 3
 var bulletForce = startBulletForce
 var gibletForce = l.canvas.width / 6
 var gibletLife = 2000
@@ -77,7 +77,7 @@ var killed = 0
 var score = 0
 var newHighscore = false
 
-var achievementValues = [100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000]
+var achievementValues = [200, 400, 600, 800, 1000, 3000, 5000, 7000, 9000, 11000, 13000, 15000]
 var achievementTitles = ['a n00b', 'bazookasaur', 'a space man', 'a krazy d00d', 'THE d00d', 'a hunter', 'the one', 'beautiful', 'teh best', 'a w!nner', 'the special', 'the doge']
 
 if (localStorage.getItem('highscore'))
