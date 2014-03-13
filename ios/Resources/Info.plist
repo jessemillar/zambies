@@ -16,6 +16,7 @@
 		<dict>
 			<key>CFBundleIconFiles</key>
 			<array>
+				<string>Icon-57</string>
 				<string>Icon.png</string>
 				<string>Icon@2x.png</string>
 				<string>Icon-60.png</string>
@@ -28,7 +29,7 @@
 		</dict>
 	</dict>
 	<key>CFBundleIdentifier</key>
-	<string>com.jessemillar.${PRODUCT_NAME:rfc1034identifier}</string>
+	<string>com.jessemillar.Zambies</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

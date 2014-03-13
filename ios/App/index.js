@@ -13,6 +13,8 @@ ejecta.include('5-mouse.js')
 ejecta.include('5-tilt.js')
 ejecta.include('5-touch.js')
 
+l.gamecenter.login.soft()
+
 var version = '0.1.7' // Make sure to update this for each new version
 
 var colorBlack = '#111111'
@@ -26,6 +28,7 @@ l.tilt.enable()
 l.touch.enable()
 
 l.debug.all = false
+l.debug.gamecenter = true
 
 l.canvas.width = l.canvas.width * 1.75
 l.canvas.height = l.canvas.width // Make the playing field square
@@ -66,6 +69,7 @@ var bulletLife = 1000
 
 var activeZombies = 0
 
+var reported = false
 var accuracy = 0
 var shotsFired = 0
 var seconds = 0
@@ -89,6 +93,10 @@ l.audio.make('song', 'sounds/song.wav')
 l.audio.make('gameover', 'sounds/gameover.wav')
 l.audio.make('kill', 'sounds/kill.wav')
 l.audio.make('shoot', 'sounds/shoot.wav')
+
+l.object.make('gamecenter', l.entities.camera.width - 28, 4, 24, 24)
+	l.object.sprite('gamecenter', 'images/gamecenter.png')
+	l.object.anchor('gamecenter', 0, 0)
 
 l.object.make('pause', l.entities.camera.width - 20, 4, 16, 16)
 	l.object.sprite('pause', 'images/pause.png')
@@ -192,6 +200,18 @@ l.screen.loading = function()
 
 l.screen.menu = function()
 {
+	if (l.touch.touched('gamecenter'))
+	{
+		if (!l.gamecenter.authed)
+		{
+			l.gamecenter.login.hard()
+		}
+		else
+		{
+			l.gamecenter.show.leaderboard('Highscore')
+		}
+	}
+
 	if (l.touch.database.length > 1)
 	{
 		l.screen.change.game()
@@ -202,11 +222,24 @@ l.screen.menu = function()
 	l.write.hud('[Tilt] to move and aim', l.entities.camera.width / 2, l.entities.camera.height / 2 + fontSize, fontFamily, fontSize, colorGreen, 'center')
 	l.write.hud('[Tap] or [Hold] to shoot', l.entities.camera.width / 2, l.entities.camera.height / 2 + fontSize * 3, fontFamily, fontSize, colorGreen, 'center')
 	l.write.hud('Two-finger touch to start', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
-	l.write.hud(version, l.entities.camera.width - textPadding, textPadding, fontFamily, fontSize / 2, colorWhite, 'right') // Display the version number
+	l.write.hud(version, textPadding, textPadding, fontFamily, fontSize / 2, colorWhite, 'left') // Display the version number
+	l.draw.hud('gamecenter')
 }
 
 l.screen.paused = function()
 {
+	if (l.touch.touched('gamecenter'))
+	{
+		if (!l.gamecenter.authed)
+		{
+			l.gamecenter.login.hard()
+		}
+		else
+		{
+			l.gamecenter.show.leaderboard('Highscore')
+		}
+	}
+
 	if (l.touch.database.length > 1)
 	{
 		l.screen.change.game()
@@ -223,8 +256,10 @@ l.screen.paused = function()
 	}
 	l.write.hud(score + pluralPoints, l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize * 3, fontFamily, totalSize, colorWhite, 'center')
 	l.write.hud('Paused!', l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize, fontFamily, achievementSize, colorYellow, 'center')
-	l.write.hud('Highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorGreen, 'center')
+	l.write.hud('Local highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorGreen, 'center')
 	l.write.hud('Two-finger touch to resume', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
+
+	l.draw.hud('gamecenter')
 }
 
 l.screen.game = function()
@@ -348,7 +383,7 @@ l.screen.game = function()
 
 	if (killed && shotsFired)
 	{
-		accuracy = killed / shotsFired
+		accuracy = killed / shotsFired * 100 // Make the number a human-readable percentage
 	}
 
 	if (killed) // Update the score
@@ -412,6 +447,31 @@ l.screen.game = function()
 
 l.screen.gameover = function()
 {
+	if (l.touch.touched('gamecenter'))
+	{
+		if (!l.gamecenter.authed)
+		{
+			l.gamecenter.login.hard()
+		}
+		else
+		{
+			l.gamecenter.show.leaderboard('Highscore')
+		}
+	}
+
+	if (!reported && l.gamecenter.authed)
+	{
+		l.gamecenter.submit.score('Highscore', score)
+
+		l.gamecenter.submit.score('Lifespan', seconds)
+
+		l.gamecenter.submit.score('Killed', killed)
+
+	    l.gamecenter.submit.score('Accuracy', accuracy)
+
+	    reported = true
+	}
+
 	if (l.touch.database.length > 1)
 	{
 		l.object.delete('bullets')
@@ -424,6 +484,7 @@ l.screen.gameover = function()
 		score = 0
 		shotsFired = 0
 		accuracy = 0
+		reported = false
 		zombieSpeed = startZombieSpeed
 		zombieVisionDistance = startZombieVisionDistance
 		spawned = false
@@ -497,7 +558,7 @@ l.screen.gameover = function()
 	l.write.hud('You\'re ' + achievement + '!', l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize, fontFamily, achievementSize, colorYellow, 'center')
 	if (newHighscore)
 	{
-		l.write.hud('New high score!', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorYellow, 'center')
+		l.write.hud('New local high score!', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorYellow, 'center')
 	}
 	else
 	{
@@ -507,10 +568,11 @@ l.screen.gameover = function()
 		}
 		else
 		{
-			l.write.hud('Highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorGreen, 'center')
+			l.write.hud('Local highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorGreen, 'center')
 		}
 	}
 	l.write.hud('Two-finger touch to retry', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
+	l.draw.hud('gamecenter')
 }
 
 function spawnZombie(count)
