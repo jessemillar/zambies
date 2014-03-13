@@ -63,9 +63,15 @@ var startZombieVisionDistance = l.canvas.width / 5
 var zombieSpeed = startZombieSpeed
 var zombieVisionDistance = startZombieVisionDistance
 var bulletLife = 1000
+var canCloseCall = true
+var closeCallTime = 500
+var closeCallDistance = 20
+var closeCallValue = 50
 
 var activeZombies = 0
 
+var accuracy = 0
+var closeCalls = 0
 var shotsFired = 0
 var seconds = 0
 var killed = 0
@@ -73,7 +79,7 @@ var score = 0
 var newHighscore = false
 
 var achievementValues = [100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000]
-var achievementTitles = ['a n00b', 'bazookasaur', 'a space man', 'a krazy d00d', 'THE d00d', 'a hunter', 'the one', 'Steve Jobs', 'teh be$t', 'a w!nner', 'the special', 'the doge']
+var achievementTitles = ['a n00b', 'bazookasaur', 'a space man', 'a krazy d00d', 'THE d00d', 'a hunter', 'the one', 'beautiful', 'teh best', 'a w!nner', 'the special', 'the doge']
 
 if (localStorage.getItem('highscore'))
 {
@@ -147,6 +153,21 @@ var scoreInterval = setInterval(function()
 							}
 						}
 					}, 1000)
+
+document.addEventListener('pagehide', function()
+{
+	if (l.game.state == 'game')
+	{
+		l.screen.change.paused()
+	}
+})
+
+/*
+document.addEventListener('pageshow', function()
+{
+	// Do stuff when we come back from sleep or multitasking
+})
+*/
 
 l.screen.loading = function()
 {
@@ -330,13 +351,18 @@ l.screen.game = function()
 		}
 	}
 
+	if (killed && shotsFired)
+	{
+		accuracy = killed / shotsFired
+	}
+
 	if (killed) // Update the score
 	{
-		score = seconds * killed
+		score = seconds * killed + closeCalls * closeCallValue
 	}
 	else
 	{
-		score = seconds
+		score = seconds + closeCalls * closeCallValue
 	}
 
 	activeZombies = 0 // Reset the active zombie count
@@ -348,6 +374,21 @@ l.screen.game = function()
 			{
 				activeZombies++
 				l.physics.pull.toward(i, 'player', zombieSpeed)
+				
+				if (l.tool.measure.total('player', i) < closeCallDistance)
+				{
+					if (canCloseCall)
+					{
+						canCloseCall = false
+						
+						closeCalls++
+						
+						setTimeout(function()
+						{
+							canCloseCall = true
+						}, closeCallTime)
+					}
+				}
 			}
 		}
 	}
@@ -402,6 +443,8 @@ l.screen.gameover = function()
 		killed = 0
 		score = 0
 		shotsFired = 0
+		closeCalls = 0
+		accuracy = 0
 		zombieSpeed = startZombieSpeed
 		zombieVisionDistance = startZombieVisionDistance
 		spawned = false
