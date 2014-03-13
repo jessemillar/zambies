@@ -13,7 +13,7 @@ ejecta.include('5-mouse.js')
 ejecta.include('5-tilt.js')
 ejecta.include('5-touch.js')
 
-var version = '0.1.6' // Make sure to update this for each new version
+var version = '0.1.7' // Make sure to update this for each new version
 
 var colorBlack = '#111111'
 var colorGreen = '#3D9970'
@@ -63,15 +63,10 @@ var startZombieVisionDistance = l.canvas.width / 5
 var zombieSpeed = startZombieSpeed
 var zombieVisionDistance = startZombieVisionDistance
 var bulletLife = 1000
-var canCloseCall = true
-var closeCallTime = 500
-var closeCallDistance = 20
-var closeCallValue = 50
 
 var activeZombies = 0
 
 var accuracy = 0
-var closeCalls = 0
 var shotsFired = 0
 var seconds = 0
 var killed = 0
@@ -358,11 +353,11 @@ l.screen.game = function()
 
 	if (killed) // Update the score
 	{
-		score = seconds * killed + closeCalls * closeCallValue
+		score = seconds * killed
 	}
 	else
 	{
-		score = seconds + closeCalls * closeCallValue
+		score = seconds
 	}
 
 	activeZombies = 0 // Reset the active zombie count
@@ -374,21 +369,6 @@ l.screen.game = function()
 			{
 				activeZombies++
 				l.physics.pull.toward(i, 'player', zombieSpeed)
-				
-				if (l.tool.measure.total('player', i) < closeCallDistance)
-				{
-					if (canCloseCall)
-					{
-						canCloseCall = false
-						
-						closeCalls++
-						
-						setTimeout(function()
-						{
-							canCloseCall = true
-						}, closeCallTime)
-					}
-				}
 			}
 		}
 	}
@@ -443,7 +423,6 @@ l.screen.gameover = function()
 		killed = 0
 		score = 0
 		shotsFired = 0
-		closeCalls = 0
 		accuracy = 0
 		zombieSpeed = startZombieSpeed
 		zombieVisionDistance = startZombieVisionDistance
