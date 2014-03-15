@@ -15,7 +15,10 @@ ejecta.include('5-touch.js')
 
 l.gamecenter.login.soft()
 
-var version = '0.1.8' // Make sure to update this for each new version
+var adBanner = new Ejecta.AdBanner()
+	adBanner.alwaysPortrait = false
+	adBanner.isAtBottom = false
+	adBanner.show()
 
 var colorBlack = '#111111'
 var colorGreen = '#3D9970'
@@ -35,8 +38,6 @@ l.canvas.height = l.canvas.width // Make the playing field square
 
 l.physics.friction(2)
 
-var difficultyIncreaseRate = 1.005
-
 var spawned = false
 
 var maxTilt = 22
@@ -47,6 +48,10 @@ var titleSize = 70
 var achievementSize = 35
 var totalSize = 35
 var textPadding = 5
+
+var topLine = l.entities.camera.height / 2 - achievementSize * 2 - fontSize
+var middleLine = l.entities.camera.height / 2 - fontSize
+var bottomLine = l.entities.camera.height / 2 + achievementSize * 2 - fontSize + textPadding
 
 var loadingTextState = 0
 
@@ -61,13 +66,10 @@ var canShoot = true
 var timeShoot = 500
 var respawnForce = l.canvas.width / 4
 var zombieCount = Math.floor(l.canvas.width / 18)
-var startZombieSpeed = playerSpeed / 2
-var startZombieVisionDistance = l.canvas.width / 5
-var zombieSpeed = startZombieSpeed
-var zombieVisionDistance = startZombieVisionDistance
+var zombieSpeed = playerSpeed / 2
+var zombieVisionDistance = l.canvas.width / 5
+var zombie2Speed = playerSpeed
 var bulletLife = 1000
-
-var activeZombies = 0
 
 var reported = false
 var accuracy = 0
@@ -94,9 +96,13 @@ l.audio.make('gameover', 'sounds/gameover.wav')
 l.audio.make('kill', 'sounds/kill.wav')
 l.audio.make('shoot', 'sounds/shoot.wav')
 
-l.object.make('gamecenter', l.entities.camera.width - 28, 4, 24, 24)
+l.object.make('gamecenter', l.entities.camera.width - 28, l.entities.camera.height - 4, 24, 24)
 	l.object.sprite('gamecenter', 'images/gamecenter.png')
-	l.object.anchor('gamecenter', 0, 0)
+	l.object.anchor('gamecenter', 0, 24)
+
+l.object.make('loader', l.entities.camera.width - 28, 4, 24, 24)
+	l.object.sprite('loader', 'images/loader.png', 96, 24, 4, 500)
+	l.object.anchor('loader', 0, 0)
 
 l.object.make('pause', l.entities.camera.width - 20, 4, 16, 16)
 	l.object.sprite('pause', 'images/pause.png')
@@ -106,20 +112,30 @@ l.object.make('player', l.canvas.width / 2, l.canvas.height / 2, 10, 10)
 	l.object.sprite('player', 'images/player.png')
 	l.object.anchor('player', 5, 10)
 
+l.prototype.make('bullet', 3, 3)
+	l.prototype.sprite('bullet', 'images/bullet.png')
+	l.prototype.categorize('bullet', 'bullets')
+	l.prototype.anchor('bullet', 3, 2)
+
 l.prototype.make('zombie', 10, 10)
 	l.prototype.sprite('zombie', 'images/zombie.png')
 	l.prototype.categorize('zombie', 'zombies')
 	l.prototype.anchor('zombie', 5, 10)
 
-l.prototype.make('bullet', 6, 6)
-	l.prototype.sprite('bullet', 'images/bullet.png')
-	l.prototype.categorize('bullet', 'bullets')
-	l.prototype.anchor('bullet', 2, 2)
-
-l.prototype.make('giblet', 6, 6)
+l.prototype.make('giblet', 3, 3)
 	l.prototype.sprite('giblet', 'images/giblet.png')
 	l.prototype.categorize('giblet', 'giblets')
 	l.prototype.anchor('giblet', 2, 2)
+
+l.prototype.make('zombie2', 10, 10)
+	l.prototype.sprite('zombie2', 'images/zombie2.png')
+	l.prototype.categorize('zombie2', 'zombies2')
+	l.prototype.anchor('zombie2', 5, 10)
+
+l.prototype.make('giblet2', 3, 3)
+	l.prototype.sprite('giblet2', 'images/giblet2.png')
+	l.prototype.categorize('giblet2', 'giblets')
+	l.prototype.anchor('giblet2', 2, 2)
 
 l.game.start()
 
@@ -146,14 +162,9 @@ var loadingInterval = setInterval(function()
 
 var scoreInterval = setInterval(function()
 					{
-						if (l.game.state == 'game' && activeZombies > 0)
+						if (l.game.state == 'game')
 						{
 							seconds++
-							zombieSpeed = zombieSpeed * difficultyIncreaseRate
-							if (zombieVisionDistance < l.canvas.width)
-							{
-								zombieVisionDistance = zombieVisionDistance * difficultyIncreaseRate
-							}
 						}
 					}, 1000)
 
@@ -161,16 +172,10 @@ document.addEventListener('pagehide', function()
 {
 	if (l.game.state == 'game')
 	{
+		adBanner.show()
 		l.screen.change.paused()
 	}
 })
-
-/*
-document.addEventListener('pageshow', function()
-{
-	// Do stuff when we come back from sleep or multitasking
-})
-*/
 
 l.screen.loading = function()
 {
@@ -214,6 +219,7 @@ l.screen.menu = function()
 
 	if (l.touch.database.length > 1)
 	{
+		adBanner.hide()
 		l.screen.change.game()
 	}
 
@@ -222,7 +228,6 @@ l.screen.menu = function()
 	l.write.hud('[Tilt] to move and aim', l.entities.camera.width / 2, l.entities.camera.height / 2 + fontSize, fontFamily, fontSize, colorGreen, 'center')
 	l.write.hud('[Tap] or [Hold] to shoot', l.entities.camera.width / 2, l.entities.camera.height / 2 + fontSize * 3, fontFamily, fontSize, colorGreen, 'center')
 	l.write.hud('Two-finger touch to start', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
-	l.write.hud(version, textPadding, textPadding, fontFamily, fontSize / 2, colorWhite, 'left') // Display the version number
 	l.draw.hud('gamecenter')
 }
 
@@ -242,6 +247,7 @@ l.screen.paused = function()
 
 	if (l.touch.database.length > 1)
 	{
+		adBanner.hide()
 		l.screen.change.game()
 	}
 	
@@ -254,9 +260,9 @@ l.screen.paused = function()
 	{
 		var pluralPoints = ' point'
 	}
-	l.write.hud(score + pluralPoints, l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize * 3, fontFamily, totalSize, colorWhite, 'center')
-	l.write.hud('Paused!', l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize, fontFamily, achievementSize, colorYellow, 'center')
-	l.write.hud('Local highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorGreen, 'center')
+	l.write.hud(score + pluralPoints, l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize * 2 - fontSize, fontFamily, totalSize, colorWhite, 'center')
+	l.write.hud('Paused!', l.entities.camera.width / 2, l.entities.camera.height / 2 - fontSize, fontFamily, achievementSize, colorYellow, 'center')
+	l.write.hud('Local highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize * 2 - fontSize + textPadding, fontFamily, fontSize, colorGreen, 'center')
 	l.write.hud('Two-finger touch to resume', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
 
 	l.draw.hud('gamecenter')
@@ -266,6 +272,7 @@ l.screen.game = function()
 {
 	if (l.touch.touched('pause'))
 	{
+		adBanner.show()
 		l.screen.change.paused()
 	}
 
@@ -395,25 +402,29 @@ l.screen.game = function()
 		score = seconds
 	}
 
-	activeZombies = 0 // Reset the active zombie count
 	for (var i in l.entities) // Move the zombies
 	{
 		if (l.entities[i].category == 'zombies')
 		{
 			if (l.tool.measure.total('player', i) < zombieVisionDistance)
 			{
-				activeZombies++
 				l.physics.pull.toward(i, 'player', zombieSpeed)
 			}
+		}
+		else if (l.entities[i].category == 'zombies2')
+		{
+			l.physics.pull.toward(i, 'player', zombie2Speed)
 		}
 	}
 
 	l.collision('bullets', 'zombies', 'killZombie(a, b)')
 	l.collision('player', 'zombies', 'gameover()')
+	l.collision('player', 'zombies2', 'gameover()')
 
 	l.physics.update('player')
 	l.physics.update('bullets')
 	l.physics.update('zombies')
+	l.physics.update('zombies2')
 	l.physics.update('giblets')
 
 	for (var i in l.entities) // Delete the slow bullets
@@ -430,6 +441,7 @@ l.screen.game = function()
 	l.physics.bounce('player')
 	l.physics.bounce('bullets')
 	l.physics.bounce('zombies')
+	l.physics.update('zombies2')
 	l.physics.bounce('giblets')
 
 	l.camera.follow('player', 50, 50)
@@ -437,6 +449,7 @@ l.screen.game = function()
 	l.draw.blank()
 	l.buffer.object('player')
 	l.buffer.object('zombies')
+	l.buffer.object('zombies2')
 	l.buffer.object('giblets')
 	l.buffer.object('bullets')
 	l.draw.objects()
@@ -474,8 +487,10 @@ l.screen.gameover = function()
 
 	if (l.touch.database.length > 1)
 	{
+		adBanner.hide()
 		l.object.delete('bullets')
 		l.object.delete('zombies')
+		l.object.delete('zombies2')
 		l.object.delete('giblets')
 		l.physics.momentum.stop('player')
 		l.move.snap('player', l.canvas.width / 2, l.canvas.height / 2)
@@ -485,8 +500,6 @@ l.screen.gameover = function()
 		shotsFired = 0
 		accuracy = 0
 		reported = false
-		zombieSpeed = startZombieSpeed
-		zombieVisionDistance = startZombieVisionDistance
 		spawned = false
 		l.screen.change.game()
 	}
@@ -501,7 +514,7 @@ l.screen.gameover = function()
 	{
 		var pluralPoints = ' point'
 	}
-	l.write.hud(score + pluralPoints, l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize * 3, fontFamily, totalSize, colorWhite, 'center')
+	l.write.hud(score + pluralPoints, l.entities.camera.width / 2, topLine, fontFamily, totalSize, colorWhite, 'center')
 
 	if (score < achievementValues[0])
 	{
@@ -555,20 +568,21 @@ l.screen.gameover = function()
 	{
 		var achievement = achievementTitles[11]
 	}
-	l.write.hud('You\'re ' + achievement + '!', l.entities.camera.width / 2, l.entities.camera.height / 2 - achievementSize, fontFamily, achievementSize, colorYellow, 'center')
+
+	l.write.hud('You\'re ' + achievement + '!', l.entities.camera.width / 2, middleLine, fontFamily, achievementSize, colorYellow, 'center')
 	if (newHighscore)
 	{
-		l.write.hud('New local high score!', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorYellow, 'center')
+		l.write.hud('New local high score!', l.entities.camera.width / 2, bottomLine, fontFamily, fontSize, colorYellow, 'center')
 	}
 	else
 	{
 		if (localStorage.getItem('highscore') == null)
 		{
-			l.write.hud('No highscores yet!', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorGreen, 'center')
+			l.write.hud('No highscores yet!', l.entities.camera.width / 2, bottomLine, fontFamily, fontSize, colorGreen, 'center')
 		}
 		else
 		{
-			l.write.hud('Local highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, l.entities.camera.height / 2 + achievementSize + textPadding, fontFamily, fontSize, colorGreen, 'center')
+			l.write.hud('Local highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, bottomLine, fontFamily, fontSize, colorGreen, 'center')
 		}
 	}
 	l.write.hud('Two-finger touch to retry', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
@@ -588,27 +602,27 @@ function spawnZombie(count)
 
 		if (direction == 0)
 		{
-			l.object.from('zombie', l.tool.random(20, l.canvas.width - 20), 20)
-			l.physics.push.down('zombie' + l.object.last.zombie, respawnForce)
-			l.physics.push.right('zombie' + l.object.last.zombie, l.tool.random(-respawnForce, respawnForce))	
+			l.object.from('zombie2', l.tool.random(20, l.canvas.width - 20), 20)
+			l.physics.push.down('zombie2' + l.object.last.zombie2, respawnForce)
+			l.physics.push.right('zombie2' + l.object.last.zombie2, l.tool.random(-respawnForce, respawnForce))	
 		}
 		else if (direction == 1)
 		{
-			l.object.from('zombie', l.tool.random(20, l.canvas.width - 20), l.canvas.height)
-			l.physics.push.up('zombie' + l.object.last.zombie, respawnForce)
-			l.physics.push.right('zombie' + l.object.last.zombie, l.tool.random(-respawnForce, respawnForce))
+			l.object.from('zombie2', l.tool.random(20, l.canvas.width - 20), l.canvas.height)
+			l.physics.push.up('zombie2' + l.object.last.zombie2, respawnForce)
+			l.physics.push.right('zombie2' + l.object.last.zombie2, l.tool.random(-respawnForce, respawnForce))
 		}
 		else if (direction == 2)
 		{
-			l.object.from('zombie', 10, l.tool.random(20, l.canvas.height - 20))
-			l.physics.push.right('zombie' + l.object.last.zombie, respawnForce)
-			l.physics.push.up('zombie' + l.object.last.zombie, l.tool.random(-respawnForce, respawnForce))
+			l.object.from('zombie2', 10, l.tool.random(20, l.canvas.height - 20))
+			l.physics.push.right('zombie2' + l.object.last.zombie2, respawnForce)
+			l.physics.push.up('zombie2' + l.object.last.zombie2, l.tool.random(-respawnForce, respawnForce))
 		}
 		else if (direction == 3)
 		{
-			l.object.from('zombie', l.canvas.width - 5, l.tool.random(20, l.canvas.height - 20))
-			l.physics.push.left('zombie' + l.object.last.zombie, respawnForce)
-			l.physics.push.up('zombie' + l.object.last.zombie, l.tool.random(-respawnForce, respawnForce))
+			l.object.from('zombie2', l.canvas.width - 5, l.tool.random(20, l.canvas.height - 20))
+			l.physics.push.left('zombie2' + l.object.last.zombie2, respawnForce)
+			l.physics.push.up('zombie2' + l.object.last.zombie2, l.tool.random(-respawnForce, respawnForce))
 		}
 	}
 }
@@ -669,5 +683,6 @@ function gameover()
 		highscore = score
 	}
 
+	adBanner.show()
 	l.screen.change.gameover()
 }
