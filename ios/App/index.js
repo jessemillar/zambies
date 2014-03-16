@@ -49,7 +49,7 @@ l.physics.friction(1)
 
 var spawned = false // Track whether zombies have spawned or not
 
-var maxTilt = 22 // The maximum tilt angle allowed (this number of degrees is the same as "flooring it")
+var maxTilt = 24 // The maximum tilt angle allowed (this number of degrees is the same as "flooring it")
 
 // Font stuff
 var fontFamily = 'MinercraftoryRegular'
@@ -66,7 +66,7 @@ var bottomLine = l.entities.camera.height / 2 + achievementSize * 2 - fontSize +
 var loadingTextState = 0 // Allow the loading text to have a "pulsing" ellipses
 
 var safeZone = l.canvas.width * 0.1 // Make sure this is less than zombieVision
-var playerSpeed = 6
+var playerSpeed = 7
 var playerCanMove = true
 var freezeTime = 1500
 
@@ -90,8 +90,8 @@ var boggartSpeed = playerSpeed * 0.6
 var boggartVision = l.canvas.width * 0.65
 var ghostSpeed = playerSpeed * 0.4
 var ghostVision = l.canvas.width * 0.4
-var wraithSpeed = playerSpeed * 0.5
-var wraithVision = l.canvas.width * 0.3
+var wraithSpeed = playerSpeed * 0.75
+var wraithVision = l.canvas.width * 0.1
 
 // Score and Game Center stuff
 var reported = false
