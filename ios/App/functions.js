@@ -6,7 +6,7 @@ function spawnEnemy(type)
 	{
 		l.object.from(type, l.tool.random(20, l.canvas.width - 20), 20)
 		l.physics.push.down(type + l.object.last[type], spawnForce)
-		l.physics.push.right(type + l.object.last[type], l.tool.random(-spawnForce, spawnForce))	
+		l.physics.push.right(type + l.object.last[type], l.tool.random(-spawnForce, spawnForce))
 	}
 	else if (direction == 1)
 	{
@@ -26,34 +26,36 @@ function spawnEnemy(type)
 		l.physics.push.left(type + l.object.last[type], spawnForce)
 		l.physics.push.up(type + l.object.last[type], l.tool.random(-spawnForce, spawnForce))
 	}
+
+	l.entities[type + l.object.last[type]].type = type // Categorize the enemies
 }
 
 function moveEnemies()
 {
 	for (var i in l.entities) // Move the enemies
 	{
-		if (l.entities[i].category == 'zombies')
+		if (l.entities[i].type == 'zombie')
 		{
 			if (l.tool.measure.total('player', i) < zombieVision)
 			{
 				l.physics.pull.toward(i, 'player', zombieSpeed)
 			}
 		}
-		else if (l.entities[i].category == 'ghosts')
+		else if (l.entities[i].type == 'ghost')
 		{
 			if (l.tool.measure.total('player', i) < ghostVision)
 			{
 				l.physics.pull.toward(i, 'player', ghostSpeed)
 			}
 		}
-		else if (l.entities[i].category == 'boggarts')
+		else if (l.entities[i].type == 'boggart')
 		{
 			if (l.tool.measure.total('player', i) < boggartVision)
 			{
 				l.physics.pull.toward(i, 'player', boggartSpeed)
 			}
 		}
-		else if (l.entities[i].category == 'wraiths')
+		else if (l.entities[i].type == 'wraith')
 		{
 			l.physics.pull.toward('player', i, wraithSpeed) // Pull the player toward the wraith
 		}
@@ -76,28 +78,28 @@ function killEnemy(bullet, enemy)
 	{
 		if (l.entities[enemy])
 		{
-			if (l.entities[enemy].category == 'zombies')
+			if (l.entities[enemy].type == 'zombie')
 			{
 				l.object.from('zombieGiblet', l.entities[enemy].anchor.x, l.entities[enemy].anchor.y)
 			
 				l.physics.scatter('zombieGiblet' + l.object.last.zombieGiblet, gibletForce)
 				lifespanGiblet('zombieGiblet' + l.object.last.zombieGiblet, l.tool.random(gibletLife / 2, gibletLife))
 			}
-			else if (l.entities[enemy].category == 'ghosts')
+			else if (l.entities[enemy].type == 'ghost')
 			{
 				l.object.from('ghostGiblet', l.entities[enemy].anchor.x, l.entities[enemy].anchor.y)
 			
 				l.physics.scatter('ghostGiblet' + l.object.last.ghostGiblet, gibletForce)
 				lifespanGiblet('ghostGiblet' + l.object.last.ghostGiblet, l.tool.random(gibletLife / 2, gibletLife))
 			}
-			else if (l.entities[enemy].category == 'boggarts')
+			else if (l.entities[enemy].type == 'boggart')
 			{
 				l.object.from('boggartGiblet', l.entities[enemy].anchor.x, l.entities[enemy].anchor.y)
 			
 				l.physics.scatter('boggartGiblet' + l.object.last.boggartGiblet, gibletForce)
 				lifespanGiblet('boggartGiblet' + l.object.last.boggartGiblet, l.tool.random(gibletLife / 2, gibletLife))
 			}
-			else if (l.entities[enemy].category == 'wraiths')
+			else if (l.entities[enemy].type == 'wraith')
 			{
 				l.object.from('wraithGiblet', l.entities[enemy].anchor.x, l.entities[enemy].anchor.y)
 			
@@ -133,6 +135,18 @@ function lifespanGiblet(giblet, time)
 	{
 		l.object.delete(giblet)
 	}, time)
+}
+
+function collision(enemy)
+{
+	if (l.entities[enemy].type == 'ghost')
+	{
+		freeze(enemy)
+	}
+	else
+	{
+		gameover()
+	}
 }
 
 function freeze(enemy)

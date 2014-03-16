@@ -11,6 +11,7 @@ l.screen.game = function()
 		for (var i = 0; i < enemyCount; i++)
 		{
 			l.object.from('zombie', l.tool.random(0, l.canvas.width), l.tool.random(0, l.canvas.height))
+			l.entities['zombie' + l.object.last.zombie].type = 'zombie'
 		}
 
 		for (var i = 0; i < enemyCount; i++)
@@ -137,21 +138,12 @@ l.screen.game = function()
 
 	moveEnemies()
 
-	l.collision('bullets', 'zombies', 'killEnemy(a, b)')
-	l.collision('bullets', 'ghosts', 'killEnemy(a, b)')
-	l.collision('bullets', 'boggarts', 'killEnemy(a, b)')
-	l.collision('bullets', 'wraiths', 'killEnemy(a, b)')
-	l.collision('player', 'zombies', 'gameover()')
-	l.collision('player', 'ghosts', 'freeze(b)')
-	l.collision('player', 'boggarts', 'gameover()')
-	l.collision('player', 'wraiths', 'gameover()')
+	l.collision('bullets', 'enemies', 'killEnemy(a, b)')
+	l.collision('player', 'enemies', 'collision(b)')
 
 	l.physics.update('player')
 	l.physics.update('bullets')
-	l.physics.update('zombies')
-	l.physics.update('ghosts')
-	l.physics.update('boggarts')
-	l.physics.update('wraiths')
+	l.physics.update('enemies')
 	l.physics.update('giblets')
 
 	for (var i in l.entities) // Delete the slow bullets
@@ -167,26 +159,13 @@ l.screen.game = function()
 
 	l.physics.bounce('player')
 	l.physics.bounce('bullets')
-	
-	l.physics.bounce('zombies')
-	l.physics.bounce('boggarts')
-	l.physics.bounce('ghosts')
-	l.physics.bounce('wraiths')
-	l.physics.bounce('giblets')
-
-	l.physics.update('zombies')
-	l.physics.update('boggarts')
-	l.physics.update('ghosts')
-	l.physics.update('wraiths')
+	l.physics.bounce('enemies')
 
 	l.camera.follow('player', 50, 50)
 
 	l.draw.blank()
 	l.buffer.object('player')
-	l.buffer.object('zombies')
-	l.buffer.object('boggarts')
-	l.buffer.object('ghosts')
-	l.buffer.object('wraiths')
+	l.buffer.object('enemies')
 	l.buffer.object('giblets')
 	l.buffer.object('bullets')
 	l.draw.objects()
