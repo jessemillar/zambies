@@ -30,7 +30,9 @@ l.screen.gameover = function()
 		l.ad.banner.hide()
 		l.object.delete('bullets')
 		l.object.delete('zombies')
-		l.object.delete('zombies2')
+		l.object.delete('ghosts')
+		l.object.delete('boggarts')
+		l.object.delete('wraiths')
 		l.object.delete('giblets')
 		l.physics.momentum.stop('player')
 		l.move.snap('player', l.canvas.width / 2, l.canvas.height / 2)
@@ -125,6 +127,6 @@ l.screen.gameover = function()
 			l.write.hud('Local highscore - ' + localStorage.getItem('highscore') + ' points', l.entities.camera.width / 2, bottomLine, fontFamily, fontSize, colorGreen, 'center')
 		}
 	}
-	l.write.hud('Two-finger touch to retry', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
+	l.write.hud('Two-fingers to retry', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
 	l.draw.hud('gamecenter')
 }

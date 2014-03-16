@@ -1,64 +1,130 @@
-function spawnZombie(count)
+function spawnEnemy(type)
 {
-	if (!count)
+	var direction = Math.round(l.tool.random(0, 3))
+
+	if (direction == 0)
 	{
-		count = 1
+		l.object.from(type, l.tool.random(20, l.canvas.width - 20), 20)
+		l.physics.push.down(type + l.object.last[type], spawnForce)
+		l.physics.push.right(type + l.object.last[type], l.tool.random(-spawnForce, spawnForce))	
 	}
-
-	for (var i = 0; i < count; i++)
+	else if (direction == 1)
 	{
-		var direction = Math.round(l.tool.random(0, 3))
+		l.object.from(type, l.tool.random(20, l.canvas.width - 20), l.canvas.height)
+		l.physics.push.up(type + l.object.last[type], spawnForce)
+		l.physics.push.right(type + l.object.last[type], l.tool.random(-spawnForce, spawnForce))
+	}
+	else if (direction == 2)
+	{
+		l.object.from(type, 10, l.tool.random(20, l.canvas.height - 20))
+		l.physics.push.right(type + l.object.last[type], spawnForce)
+		l.physics.push.up(type + l.object.last[type], l.tool.random(-spawnForce, spawnForce))
+	}
+	else if (direction == 3)
+	{
+		l.object.from(type, l.canvas.width - 5, l.tool.random(20, l.canvas.height - 20))
+		l.physics.push.left(type + l.object.last[type], spawnForce)
+		l.physics.push.up(type + l.object.last[type], l.tool.random(-spawnForce, spawnForce))
+	}
+}
 
-		if (direction == 0)
+function moveEnemies()
+{
+	for (var i in l.entities) // Move the enemies
+	{
+		if (l.entities[i].category == 'zombies')
 		{
-			l.object.from('zombie2', l.tool.random(20, l.canvas.width - 20), 20)
-			l.physics.push.down('zombie2' + l.object.last.zombie2, respawnForce)
-			l.physics.push.right('zombie2' + l.object.last.zombie2, l.tool.random(-respawnForce, respawnForce))	
+			if (l.tool.measure.total('player', i) < zombieVision)
+			{
+				l.physics.pull.toward(i, 'player', zombieSpeed)
+			}
 		}
-		else if (direction == 1)
+		else if (l.entities[i].category == 'ghosts')
 		{
-			l.object.from('zombie2', l.tool.random(20, l.canvas.width - 20), l.canvas.height)
-			l.physics.push.up('zombie2' + l.object.last.zombie2, respawnForce)
-			l.physics.push.right('zombie2' + l.object.last.zombie2, l.tool.random(-respawnForce, respawnForce))
+			if (l.tool.measure.total('player', i) < ghostVision)
+			{
+				l.physics.pull.toward(i, 'player', ghostSpeed)
+			}
 		}
-		else if (direction == 2)
+		else if (l.entities[i].category == 'boggarts')
 		{
-			l.object.from('zombie2', 10, l.tool.random(20, l.canvas.height - 20))
-			l.physics.push.right('zombie2' + l.object.last.zombie2, respawnForce)
-			l.physics.push.up('zombie2' + l.object.last.zombie2, l.tool.random(-respawnForce, respawnForce))
+			if (l.tool.measure.total('player', i) < boggartVision)
+			{
+				l.physics.pull.toward(i, 'player', boggartSpeed)
+			}
 		}
-		else if (direction == 3)
+		else if (l.entities[i].category == 'wraiths')
 		{
-			l.object.from('zombie2', l.canvas.width - 5, l.tool.random(20, l.canvas.height - 20))
-			l.physics.push.left('zombie2' + l.object.last.zombie2, respawnForce)
-			l.physics.push.up('zombie2' + l.object.last.zombie2, l.tool.random(-respawnForce, respawnForce))
+			l.physics.pull.toward('player', i, wraithSpeed) // Pull the player toward the wraith
 		}
 	}
 }
 
-function killZombie(bullet, zombie)
+function killEnemy(bullet, enemy)
 {
 	l.audio.rewind('kill')
 	l.audio.play('kill')
 
 	killed++ // Log the kill
 
-	l.object.delete(bullet)
+	if (bullet)
+	{
+		l.object.delete(bullet)
+	}
 	
 	for (var i = 0; i < gibletCount; i++)
 	{
-		if (l.entities[zombie])
+		if (l.entities[enemy])
 		{
-			l.object.from('giblet', l.entities[zombie].anchor.x, l.entities[zombie].anchor.y)
+			if (l.entities[enemy].category == 'zombies')
+			{
+				l.object.from('zombieGiblet', l.entities[enemy].anchor.x, l.entities[enemy].anchor.y)
 			
-			l.physics.scatter('giblet' + l.object.last.giblet, gibletForce)
-			lifespanGiblet('giblet' + l.object.last.giblet, l.tool.random(gibletLife / 2, gibletLife))
+				l.physics.scatter('zombieGiblet' + l.object.last.zombieGiblet, gibletForce)
+				lifespanGiblet('zombieGiblet' + l.object.last.zombieGiblet, l.tool.random(gibletLife / 2, gibletLife))
+			}
+			else if (l.entities[enemy].category == 'ghosts')
+			{
+				l.object.from('ghostGiblet', l.entities[enemy].anchor.x, l.entities[enemy].anchor.y)
+			
+				l.physics.scatter('ghostGiblet' + l.object.last.ghostGiblet, gibletForce)
+				lifespanGiblet('ghostGiblet' + l.object.last.ghostGiblet, l.tool.random(gibletLife / 2, gibletLife))
+			}
+			else if (l.entities[enemy].category == 'boggarts')
+			{
+				l.object.from('boggartGiblet', l.entities[enemy].anchor.x, l.entities[enemy].anchor.y)
+			
+				l.physics.scatter('boggartGiblet' + l.object.last.boggartGiblet, gibletForce)
+				lifespanGiblet('boggartGiblet' + l.object.last.boggartGiblet, l.tool.random(gibletLife / 2, gibletLife))
+			}
+			else if (l.entities[enemy].category == 'wraiths')
+			{
+				l.object.from('wraithGiblet', l.entities[enemy].anchor.x, l.entities[enemy].anchor.y)
+			
+				l.physics.scatter('wraithGiblet' + l.object.last.wraithGiblet, gibletForce)
+				lifespanGiblet('wraithGiblet' + l.object.last.wraithGiblet, l.tool.random(gibletLife / 2, gibletLife))
+			}
 		}
 	}
-	
-	l.object.delete(zombie)
 
-	spawnZombie() // Let's make the whole survival thing hopeless, shall we?
+	if (l.entities[enemy].category == 'zombies')
+	{
+		spawnEnemy('ghost')
+	}
+	else if (l.entities[enemy].category == 'ghosts')
+	{
+		spawnEnemy('boggart')
+	}
+		else if (l.entities[enemy].category == 'boggarts')
+	{
+		spawnEnemy('wraith')
+	}
+	else if (l.entities[enemy].category == 'wraiths')
+	{
+		spawnEnemy('zombie')
+	}
+	
+	l.object.delete(enemy)
 }
 
 function lifespanGiblet(giblet, time)
@@ -67,6 +133,19 @@ function lifespanGiblet(giblet, time)
 	{
 		l.object.delete(giblet)
 	}, time)
+}
+
+function freeze(enemy)
+{
+	killEnemy(null, enemy)
+	l.physics.momentum.stop('player')
+
+	playerCanMove = false
+
+	setTimeout(function()
+	{
+		playerCanMove = true
+	}, freezeTime)
 }
 
 function gameover()

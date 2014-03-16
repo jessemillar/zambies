@@ -87,6 +87,20 @@ l.screen.change.menu = function()
 	l.game.loop = setInterval(l.screen.menu, 1000 / 60)
 }
 
+l.screen.change.settings = function()
+{
+    clearInterval(l.game.loop)
+    l.game.state = 'settings'
+    l.game.loop = setInterval(l.screen.settings, 1000 / 60)
+}
+
+l.screen.change.credits = function()
+{
+    clearInterval(l.game.loop)
+    l.game.state = 'credits'
+    l.game.loop = setInterval(l.screen.credits, 1000 / 60)
+}
+
 l.screen.change.game = function()
 {
 	clearInterval(l.game.loop)

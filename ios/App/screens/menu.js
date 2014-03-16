@@ -22,6 +22,6 @@ l.screen.menu = function()
 	l.write.hud('Zambies!', l.entities.camera.width / 2, l.entities.camera.height / 2 - titleSize - fontSize, fontFamily, titleSize, colorYellow, 'center')
 	l.write.hud('[Tilt] to move and aim', l.entities.camera.width / 2, l.entities.camera.height / 2 + fontSize, fontFamily, fontSize, colorGreen, 'center')
 	l.write.hud('[Tap] or [Hold] to shoot', l.entities.camera.width / 2, l.entities.camera.height / 2 + fontSize * 3, fontFamily, fontSize, colorGreen, 'center')
-	l.write.hud('Two-finger touch to start', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
+	l.write.hud('Two-fingers to start', textPadding, l.entities.camera.height - fontSize - textPadding, fontFamily, fontSize, colorWhite)
 	l.draw.hud('gamecenter')
 }

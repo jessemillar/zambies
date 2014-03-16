@@ -17,6 +17,22 @@ var loadingInterval = setInterval(function()
 						}
 					}, 750)
 
+var creditsInterval = setInterval(function()
+					{
+						if (l.game.state == 'menu')
+						{
+							l.screen.change.credits()
+						}
+						else if (l.game.state == 'credits')
+						{
+							l.screen.change.menu()
+						}
+						else if (l.game.state !== 'loading')
+						{
+							clearInterval(creditsInterval)
+						}
+					}, 5000)
+
 var scoreInterval = setInterval(function()
 					{
 						if (l.game.state == 'game')

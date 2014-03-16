@@ -8,14 +8,14 @@ l.screen.game = function()
 
 	if (!spawned)
 	{
-		for (var i = 0; i < zombieCount; i++)
+		for (var i = 0; i < enemyCount; i++)
 		{
 			l.object.from('zombie', l.tool.random(0, l.canvas.width), l.tool.random(0, l.canvas.height))
 		}
 
-		for (var i = 0; i < zombieCount; i++)
+		for (var i = 0; i < enemyCount; i++)
 		{
-			if (l.tool.measure.total('player', 'zombie' + (Math.round(l.object.last.zombie - zombieCount) + i)) < safeZone)
+			if (l.tool.measure.total('player', 'zombie' + (Math.round(l.object.last.zombie - enemyCount) + i)) < safeZone)
 			{
 				var quadrant = Math.round(l.tool.random(0, 3))
 				
@@ -40,29 +40,32 @@ l.screen.game = function()
 					var y = l.tool.random(0, l.canvas.height)
 				}
 			
-				l.move.snap('zombie' + (Math.round(l.object.last.zombie - zombieCount) + i), x, y)
+				l.move.snap('zombie' + (Math.round(l.object.last.zombie - enemyCount) + i), x, y)
 			}
 		}
 		
 		spawned = true
 	}
 
-	if (l.tilt.y < 0)
+	if (playerCanMove)
 	{
-		l.physics.push.up('player', playerSpeed * (Math.abs(l.tilt.y) / maxTilt))
-	}
-	else if (l.tilt.y > 0)
-	{
-		l.physics.push.down('player', playerSpeed * (Math.abs(l.tilt.y) / maxTilt))
-	}
+		if (l.tilt.y < 0)
+		{
+			l.physics.push.up('player', playerSpeed * (Math.abs(l.tilt.y) / maxTilt))
+		}
+		else if (l.tilt.y > 0)
+		{
+			l.physics.push.down('player', playerSpeed * (Math.abs(l.tilt.y) / maxTilt))
+		}
 
-	if (l.tilt.x > 0)
-	{
-		l.physics.push.left('player', playerSpeed * (Math.abs(l.tilt.x) / maxTilt))
-	}
-	else if (l.tilt.x < 0)
-	{
-		l.physics.push.right('player', playerSpeed * (Math.abs(l.tilt.x) / maxTilt))
+		if (l.tilt.x > 0)
+		{
+			l.physics.push.left('player', playerSpeed * (Math.abs(l.tilt.x) / maxTilt))
+		}
+		else if (l.tilt.x < 0)
+		{
+			l.physics.push.right('player', playerSpeed * (Math.abs(l.tilt.x) / maxTilt))
+		}
 	}
 
 	if (l.touch.database.length == 1)
@@ -132,29 +135,23 @@ l.screen.game = function()
 		score = seconds
 	}
 
-	for (var i in l.entities) // Move the zombies
-	{
-		if (l.entities[i].category == 'zombies')
-		{
-			if (l.tool.measure.total('player', i) < zombieVisionDistance)
-			{
-				l.physics.pull.toward(i, 'player', zombieSpeed)
-			}
-		}
-		else if (l.entities[i].category == 'zombies2')
-		{
-			l.physics.pull.toward(i, 'player', zombie2Speed)
-		}
-	}
+	moveEnemies()
 
-	l.collision('bullets', 'zombies', 'killZombie(a, b)')
+	l.collision('bullets', 'zombies', 'killEnemy(a, b)')
+	l.collision('bullets', 'ghosts', 'killEnemy(a, b)')
+	l.collision('bullets', 'boggarts', 'killEnemy(a, b)')
+	l.collision('bullets', 'wraiths', 'killEnemy(a, b)')
 	l.collision('player', 'zombies', 'gameover()')
-	l.collision('player', 'zombies2', 'gameover()')
+	l.collision('player', 'ghosts', 'freeze(b)')
+	l.collision('player', 'boggarts', 'gameover()')
+	l.collision('player', 'wraiths', 'gameover()')
 
 	l.physics.update('player')
 	l.physics.update('bullets')
 	l.physics.update('zombies')
-	l.physics.update('zombies2')
+	l.physics.update('ghosts')
+	l.physics.update('boggarts')
+	l.physics.update('wraiths')
 	l.physics.update('giblets')
 
 	for (var i in l.entities) // Delete the slow bullets
@@ -170,8 +167,15 @@ l.screen.game = function()
 
 	l.physics.bounce('player')
 	l.physics.bounce('bullets')
+	
 	l.physics.bounce('zombies')
-	l.physics.update('zombies2')
+	l.physics.bounce('boggarts')
+	l.physics.bounce('ghosts')
+	l.physics.bounce('wraiths')
+
+	l.physics.update('ghosts')
+	l.physics.update('boggarts')
+	l.physics.update('wraiths')
 	l.physics.bounce('giblets')
 
 	l.camera.follow('player', 50, 50)
@@ -179,7 +183,9 @@ l.screen.game = function()
 	l.draw.blank()
 	l.buffer.object('player')
 	l.buffer.object('zombies')
-	l.buffer.object('zombies2')
+	l.buffer.object('ghosts')
+	l.buffer.object('boggarts')
+	l.buffer.object('wraiths')
 	l.buffer.object('giblets')
 	l.buffer.object('bullets')
 	l.draw.objects()
