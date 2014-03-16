@@ -80,20 +80,18 @@ var gibletCount = 6
 
 var canShoot = true
 var timeShoot = 500
-var spawnForce = l.canvas.width / 4
+var spawnForce = l.canvas.width * 0.2
 
 var enemyCount = Math.round(l.canvas.width / 18)
 
-var zombieSpeed = playerSpeed * 0.3
+var zombieSpeed = playerSpeed * 0.4
 var zombieVision = l.canvas.width * 0.2
-var boggartSpeed = playerSpeed * 0.5
+var boggartSpeed = playerSpeed * 0.6
 var boggartVision = l.canvas.width * 0.65
-var ghostSpeed = playerSpeed * 0.3
+var ghostSpeed = playerSpeed * 0.4
 var ghostVision = l.canvas.width * 0.4
 var wraithSpeed = playerSpeed * 0.5
 var wraithVision = l.canvas.width * 0.3
-
-console.log(zombieSpeed, ghostSpeed)
 
 // Score and Game Center stuff
 var reported = false
