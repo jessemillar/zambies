@@ -7,10 +7,6 @@ l.object.make('gamecenter', l.entities.camera.width - 28, l.entities.camera.heig
 	l.object.sprite('gamecenter', 'images/gamecenter.png')
 	l.object.anchor('gamecenter', 0, 24)
 
-l.object.make('loader', l.entities.camera.width - 28, 4, 24, 24)
-	l.object.sprite('loader', 'images/loader.png', 96, 24, 4, 500)
-	l.object.anchor('loader', 0, 0)
-
 l.object.make('pause', l.entities.camera.width - 20, 4, 16, 16)
 	l.object.sprite('pause', 'images/pause.png')
 	l.object.anchor('pause', 0, 0)
