@@ -80,7 +80,7 @@ var gibletCount = 6
 
 var canShoot = true
 var timeShoot = 500
-var spawnForce = l.canvas.width * 0.2
+var spawnForce = playerSpeed * 7
 
 var enemyCount = Math.round(l.canvas.width / 18)
 
