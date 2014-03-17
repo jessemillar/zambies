@@ -31,7 +31,7 @@ var creditsInterval = setInterval(function()
 						{
 							clearInterval(creditsInterval)
 						}
-					}, 5000)
+					}, 6500)
 
 var scoreInterval = setInterval(function()
 					{

@@ -2,6 +2,8 @@ ejecta.include('lorina/1-lorina.js')
 ejecta.include('lorina/2-audio.js')
 ejecta.include('lorina/2-objects.js')
 ejecta.include('lorina/2-prototype.js')
+ejecta.include('lorina/2-tools.js')
+ejecta.include('lorina/3-apple.js')
 ejecta.include('lorina/3-draw.js')
 ejecta.include('lorina/3-preloader.js')
 ejecta.include('lorina/3-text.js')
@@ -12,6 +14,8 @@ ejecta.include('lorina/5-keyboard.js')
 ejecta.include('lorina/5-mouse.js')
 ejecta.include('lorina/5-tilt.js')
 ejecta.include('lorina/5-touch.js')
+
+//ejecta.include('lorina.min.js')
 
 ejecta.include('listeners.js')
 ejecta.include('functions.js')
@@ -65,8 +69,8 @@ var bottomLine = l.entities.camera.height / 2 + achievementSize * 2 - fontSize +
 
 var loadingTextState = 0 // Allow the loading text to have a "pulsing" ellipses
 
-var safeZone = l.canvas.width * 0.1 // Make sure this is less than zombieVision
-var playerSpeed = 6
+var safeZone = l.canvas.width * 0.2 // Make sure this is less than zombieVision
+var playerSpeed = 7
 var playerCanMove = true
 var freezeTime = 1500
 
@@ -80,17 +84,17 @@ var gibletCount = 6
 
 var canShoot = true
 var timeShoot = 500
-var spawnForce = playerSpeed * 22
+var spawnForce = playerSpeed * 25
 
 var enemyCount = Math.round(l.canvas.width / 18)
 
-var zombieSpeed = playerSpeed * 0.4
+var zombieSpeed = playerSpeed * 0.35
 var zombieVision = l.canvas.width * 0.2
-var boggartSpeed = playerSpeed * 0.6
+var boggartSpeed = playerSpeed * 0.55
 var boggartVision = l.canvas.width * 0.65
-var ghostSpeed = playerSpeed * 0.4
+var ghostSpeed = playerSpeed * 0.35
 var ghostVision = l.canvas.width * 0.4
-var wraithSpeed = playerSpeed * 0.75
+var wraithSpeed = playerSpeed * 0.7
 var wraithVision = l.canvas.width * 0.1
 
 // Score and Game Center stuff
