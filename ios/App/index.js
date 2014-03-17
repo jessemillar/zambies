@@ -66,7 +66,7 @@ var bottomLine = l.entities.camera.height / 2 + achievementSize * 2 - fontSize +
 var loadingTextState = 0 // Allow the loading text to have a "pulsing" ellipses
 
 var safeZone = l.canvas.width * 0.1 // Make sure this is less than zombieVision
-var playerSpeed = 7
+var playerSpeed = 6
 var playerCanMove = true
 var freezeTime = 1500
 
@@ -80,7 +80,7 @@ var gibletCount = 6
 
 var canShoot = true
 var timeShoot = 500
-var spawnForce = playerSpeed * 12
+var spawnForce = playerSpeed * 22
 
 var enemyCount = Math.round(l.canvas.width / 18)
 

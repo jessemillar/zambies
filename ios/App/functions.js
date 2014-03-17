@@ -109,19 +109,19 @@ function killEnemy(bullet, enemy)
 		}
 	}
 
-	if (l.entities[enemy].category == 'zombies')
+	if (l.entities[enemy].type == 'zombie')
 	{
 		spawnEnemy('ghost')
 	}
-	else if (l.entities[enemy].category == 'ghosts')
+	else if (l.entities[enemy].type == 'ghost')
 	{
 		spawnEnemy('boggart')
 	}
-		else if (l.entities[enemy].category == 'boggarts')
+		else if (l.entities[enemy].type == 'boggart')
 	{
 		spawnEnemy('wraith')
 	}
-	else if (l.entities[enemy].category == 'wraiths')
+	else if (l.entities[enemy].type == 'wraith')
 	{
 		spawnEnemy('zombie')
 	}
