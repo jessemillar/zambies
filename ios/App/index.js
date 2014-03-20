@@ -95,8 +95,8 @@ var boggartSpeed = playerSpeed * 0.55
 var boggartVision = l.canvas.width * 0.65
 var ghostSpeed = playerSpeed * 0.35
 var ghostVision = l.canvas.width * 0.4
-var wraithSpeed = playerSpeed * 0.7
-var wraithVision = l.canvas.width * 0.1
+var wraithSpeed = playerSpeed * 0.35
+var wraithVision = l.canvas.width * 0.05
 
 // Score and Game Center stuff
 var reported = false

@@ -20,8 +20,6 @@ l.screen.gameover = function()
 
 		l.gamecenter.submit.score('Killed', killed)
 
-	    l.gamecenter.submit.score('Accuracy', accuracy)
-
 	    reported = true
 	}
 
