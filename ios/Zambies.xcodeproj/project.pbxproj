@@ -15,6 +15,7 @@
 		3EBC19BE16CECE190036F9F3 /* EJBindingKeyInput.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EBC19BD16CECE190036F9F3 /* EJBindingKeyInput.m */; };
 		3EF00C5916C29360004599A4 /* EJJavaScriptView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EF00C5816C29360004599A4 /* EJJavaScriptView.m */; };
 		5B7B76761619DB9700691910 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B7B76751619DB9700691910 /* CoreText.framework */; };
+		88BC840C18DAA81A00544632 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88BC840B18DAA81A00544632 /* Images.xcassets */; };
 		88D1519418CA5F67002F646E /* minercraftory.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 88D1519318CA5F67002F646E /* minercraftory.ttf */; };
 		B6074FF315F8E41700D987F9 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6074FF215F8E41600D987F9 /* GameKit.framework */; };
 		B607AB67132EA6C300D7C3EA /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B607AB66132EA6C300D7C3EA /* OpenAL.framework */; };
@@ -136,6 +137,7 @@
 		3EF00C5816C29360004599A4 /* EJJavaScriptView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EJJavaScriptView.m; sourceTree = "<group>"; };
 		5B7B76751619DB9700691910 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		886E167E18D22B1500E42527 /* Icon-57@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-57@2x.png"; sourceTree = "<group>"; };
+		88BC840B18DAA81A00544632 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Zambies/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		88D1519318CA5F67002F646E /* minercraftory.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = minercraftory.ttf; sourceTree = "<group>"; };
 		B6074FF215F8E41600D987F9 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		B607AB66132EA6C300D7C3EA /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
@@ -559,6 +561,7 @@
 		B64CE683166682B10087CF94 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				88BC840B18DAA81A00544632 /* Images.xcassets */,
 				886E167E18D22B1500E42527 /* Icon-57@2x.png */,
 				88D1519318CA5F67002F646E /* minercraftory.ttf */,
 				B99F05BD188C4125002F194D /* Icon-60.png */,
@@ -723,6 +726,7 @@
 				B609F2D416AD877E00A3B2B9 /* RadialGradient.fsh in Resources */,
 				B68C5B95132E6CD60015092E /* App in Resources */,
 				B64CE68F166682B10087CF94 /* Default-568h@2x.png in Resources */,
+				88BC840C18DAA81A00544632 /* Images.xcassets in Resources */,
 				B64CE690166682B10087CF94 /* Default-Landscape.png in Resources */,
 				B64CE691166682B10087CF94 /* Default-Portrait.png in Resources */,
 				B64CE692166682B10087CF94 /* Default.png in Resources */,
@@ -825,6 +829,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer: Jesse Millar (289RY3QZ59)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jesse Millar (289RY3QZ59)";
 				COPY_PHASE_STRIP = NO;
@@ -856,6 +861,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: JESSE MILLAR (FJCT9P6B25)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: JESSE MILLAR (FJCT9P6B25)";
 				COPY_PHASE_STRIP = YES;

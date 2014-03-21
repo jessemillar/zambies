@@ -21,11 +21,11 @@ var creditsInterval = setInterval(function()
 					{
 						if (l.game.state == 'menu')
 						{
-							l.screen.change.credits()
+							l.change.screen('credits')
 						}
 						else if (l.game.state == 'credits')
 						{
-							l.screen.change.menu()
+							l.change.screen('menu')
 						}
 						else if (l.game.state !== 'loading')
 						{
@@ -46,6 +46,6 @@ document.addEventListener('pagehide', function()
 	if (l.game.state == 'game')
 	{
 		l.ad.banner.show('top')
-		l.screen.change.paused()
+		l.change.screen('paused')
 	}
 })

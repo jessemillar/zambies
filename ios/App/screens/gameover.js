@@ -38,7 +38,7 @@ l.screen.gameover = function()
 		accuracy = 0
 		reported = false
 		spawned = false
-		l.screen.change.game()
+		l.change.screen('game')
 	}
 
 	l.draw.blank(colorBlack)

@@ -186,5 +186,5 @@ function gameover()
 	}
 
 	l.ad.banner.show('top')
-	l.screen.change.gameover()
+	l.change.screen('gameover')
 }

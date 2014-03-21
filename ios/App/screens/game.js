@@ -3,7 +3,7 @@ l.screen.game = function()
 	if (l.touch.touched('pause'))
 	{
 		l.ad.banner.show('top')
-		l.screen.change.paused()
+		l.change.screen('paused')
 	}
 
 	if (!spawned)

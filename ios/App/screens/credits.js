@@ -14,7 +14,7 @@ l.screen.credits = function()
 
 	if (l.touch.database.length > 1)
 	{
-		l.screen.change.game()
+		l.change.screen('game')
 	}
 	
 	l.draw.blank()
