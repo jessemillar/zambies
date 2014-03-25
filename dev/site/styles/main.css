@@ -24,7 +24,7 @@ body {
 	z-index: 0;
 }
 
-	#logo {
+	#zambies {
 		position: absolute;
 		left: 0px;
 		top: 50%;
@@ -59,9 +59,10 @@ body {
 	margin-left: -250px;
 	margin-top: 400px;
 
-	color: #FFFFFF;
+	color: #3D9970;
 	font-family: Helvetica;
 	font-size: 13px;
+	font-weight: bold;
 	letter-spacing: 2px;
 	line-height: 25px;
 }
@@ -78,9 +79,10 @@ body {
 		width: 500px;
 		height: auto;
 
+		margin-bottom: 25px;
+		margin-top: 35px;
+
 		font-size: 10px;
 		letter-spacing: 1px;
-		margin-bottom: 25px;
-		margin-top: 75px;
 		text-align: center;
 	}
